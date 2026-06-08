@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OAN Vendor Impostor Challenge</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--s:1}
+html{font-size:calc(14px * var(--s))}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#EEF2FA;min-height:100vh}
+
+/* SCALE PANEL */
+#sp{position:fixed;top:14px;right:14px;z-index:9999;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+#sp-toggle{width:42px;height:42px;border-radius:50%;background:#1F95E3;border:none;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(31,149,227,.3);color:#fff}
+#sp-box{display:none;background:#fff;border-radius:2px;padding:16px 18px;box-shadow:0 4px 20px rgba(0,0,0,.2);min-width:200px;border:1.5px solid #E3ECF3}
+#sp-box.open{display:block}
+#sp-box label{font-size:11px;font-weight:800;color:#0F2A44;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:8px}
+#sp-slider{width:100%;accent-color:#1F95E3}
+#sp-val{font-size:14px;font-weight:700;color:#1F95E3;text-align:center;margin-top:6px}
+#sp-presets{display:flex;gap:5px;margin-top:8px}
+#sp-presets button{flex:1;padding:5px 0;border-radius:2px;border:1.5px solid #E3ECF3;background:#EEF2FA;font-size:11px;font-weight:800;color:#0F2A44;cursor:pointer;font-family:inherit}
+#sp-presets button:hover{background:#E3ECF3}
+#sp-presets button.act{background:#1F95E3;color:#fff;border-color:#1F95E3}
+
+/* NAV */
+.nav{background:#0E2A44;display:flex;align-items:center;justify-content:space-between;padding:0 2.5rem;height:5rem;flex-shrink:0}
+.nav-left{display:flex;align-items:center;gap:1.25rem}
+.nav-logo-box{width:4rem;height:4rem;background:#fff;border-radius:2px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
+.nav-logo-box img{width:3.75rem;height:3.75rem;object-fit:contain;display:block}
+.nav-brand{font-size:1.75rem;font-weight:800;color:#fff;line-height:1}
+.nav-agent{font-size:.75rem;font-weight:700;color:#1F95E3;text-transform:uppercase;letter-spacing:.1em;margin-top:3px;font-family:'Consolas',ui-monospace,monospace}
+.nav-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);border-radius:2px;padding:.5rem 1.375rem;font-size:1.0625rem;color:rgba(255,255,255,.85);font-weight:600}
+.nav-dot{width:.625rem;height:.625rem;border-radius:50%;background:#4AE0A0;animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* START HERO */
+.start-hero{background:#0E2A44;padding:3.5rem 3.75rem 4rem;text-align:center}
+.hero-logo-row{display:flex;align-items:center;justify-content:center;gap:1.5rem;margin-bottom:2rem}
+.hero-logo-box{width:5.5rem;height:5.5rem;background:#fff;border-radius:2px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
+.hero-logo-box img{width:5.25rem;height:5.25rem;object-fit:contain;display:block}
+.hero-brand-name{font-size:2.75rem;font-weight:800;color:#fff;line-height:1}
+.hero-agent-line{font-size:.875rem;font-weight:700;color:#1F95E3;text-transform:uppercase;letter-spacing:.12em;margin-top:8px;font-family:'Consolas',ui-monospace,monospace}
+.hero-divider{width:3px;height:4.5rem;background:rgba(255,255,255,.2);flex-shrink:0}
+.hero-h1{font-size:4.25rem;font-weight:400;color:#fff;line-height:1.05;margin-bottom:1rem;letter-spacing:-.01em;font-family:'Georgia',serif}
+.hero-h1 .gold{color:#1F95E3}
+.hero-tagline{font-size:1.75rem;color:rgba(255,255,255,.6)}
+
+/* START BODY */
+.start-body{background:#EEF2FA;padding:3rem 3.75rem 3.5rem}
+.rules{display:flex;flex-direction:column;gap:1rem;margin-bottom:2.75rem}
+.rule{display:flex;align-items:center;gap:1.375rem;background:#F4F7FA;border-radius:2px;padding:1.375rem 2rem;border-left:3px solid #1F95E3}
+.rule-icon-box{width:3.5rem;height:3.5rem;border-radius:2px;background:#F2F6FA;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ri{font-size:1.875rem;color:#1F95E3}
+.star-ri{width:1.875rem;height:1.875rem}
+.rule-t{font-size:1.5rem;font-weight:800;color:#0F2A44;margin-bottom:4px}
+.rule-s{font-size:1.125rem;color:#7C8A99;line-height:1.4}
+
+/* LEVEL SELECT */
+.level-select-wrap{background:#EEF2FA;padding:0 3.75rem 3.5rem}
+.level-title{font-size:1.625rem;font-weight:800;color:#0F2A44;margin-bottom:1.25rem;text-align:center}
+.level-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.level-card{background:#fff;border-radius:2px;padding:2rem 1.75rem;border:2.5px solid #E3ECF3;cursor:pointer;transition:all .15s;text-align:center}
+.level-card:hover{border-color:#1F95E3;transform:translateY(-2px);box-shadow:0 4px 16px rgba(31,149,227,.15)}
+.level-card.beginner:hover,.level-card.beginner.selected{border-color:#0F6E56;background:#E1F5EE}
+.level-card.advanced:hover,.level-card.advanced.selected{border-color:#854F0B;background:#FAEEDA}
+.level-card.expert:hover,.level-card.expert.selected{border-color:#A32D2D;background:#FCEBEB}
+.lc-icon{font-size:2.75rem;margin-bottom:.75rem;line-height:1}
+.lc-name{font-size:1.625rem;font-weight:900;color:#0F2A44;margin-bottom:.5rem}
+.lc-desc{font-size:1rem;color:#7C8A99;line-height:1.45;margin-bottom:1.125rem}
+.lc-badge{display:inline-block;border-radius:2px;padding:4px 14px;font-size:.875rem;font-weight:800}
+.lc-badge.b{background:#E1F5EE;color:#085041}
+.lc-badge.a{background:#FAEEDA;color:#633806}
+.lc-badge.e{background:#FCEBEB;color:#791F1F}
+.lc-badge.s{background:#F2F6FA;color:#0F2A44}
+.level-card.supplier:hover,.level-card.supplier.selected{border-color:#0F2A44;background:#F2F6FA}
+.lc-q{font-size:.9rem;color:#7C8A99;margin-top:.5rem}
+.go-btn{display:flex;align-items:center;justify-content:center;gap:.875rem;width:100%;padding:1.75rem;font-size:1.875rem;font-weight:900;border-radius:2px;border:none;background:#1F95E3;color:#fff;cursor:pointer;font-family:inherit;margin-top:2rem}
+.go-btn:hover{background:#1A80C8}
+.go-btn:disabled{opacity:.35;cursor:default}
+
+/* GAME */
+.game-body{padding:1.5rem 2.25rem 2.25rem;background:#EEF2FA}
+.hud{display:flex;align-items:center;gap:1.25rem;background:#F4F7FA;border-radius:2px;padding:1.125rem 2rem;margin-bottom:1rem}
+.hud-score-n{font-size:3rem;font-weight:900;color:#0F2A44;line-height:1}
+.hud-score-d{font-size:1.25rem;color:#7C8A99;margin-left:5px;font-weight:600}
+.hud-sep{width:2px;height:3.5rem;background:#E3ECF3;flex-shrink:0}
+.hud-round-lbl{font-size:.7rem;color:#7C8A99;text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:.5rem;font-family:'Consolas',ui-monospace,monospace}
+.hud-pips{display:flex;gap:.625rem}
+.pip{width:3rem;height:.625rem;border-radius:.3125rem;background:#F2F6FA}
+.pip.done{background:#1F95E3}.pip.now{background:#7CB8E8}
+.hud-ml{margin-left:auto;display:flex;align-items:center;gap:.875rem}
+.ll-pips{display:flex;gap:.4375rem}
+.ll-p{width:1rem;height:1rem;border-radius:50%;background:#1F95E3}
+.ll-p.spent{background:#E3ECF3}
+.ll-txt{font-size:1.125rem;color:#7C8A99;font-weight:600}
+.diff-badge{display:inline-flex;align-items:center;gap:5px;border-radius:2px;padding:4px 14px;font-size:.875rem;font-weight:800;margin-left:.625rem}
+.diff-b{background:#E1F5EE;color:#085041}.diff-a{background:#FAEEDA;color:#633806}.diff-e{background:#FCEBEB;color:#791F1F}
+.diff-s{background:#F2F6FA;color:#0F2A44}
+
+.timer-row{display:flex;align-items:center;gap:1.125rem;background:#F4F7FA;border-radius:2px;padding:.875rem 2rem;margin-bottom:1rem}
+.t-bar{flex:1;height:.875rem;background:#F2F6FA;border-radius:.4375rem;overflow:hidden}
+.t-fill{height:.875rem;border-radius:.4375rem;transition:background .4s}
+.t-cd{font-size:2rem;font-weight:900;color:#0F2A44;min-width:4rem;text-align:right}
+.paused-tag{display:none;align-items:center;gap:6px;background:#F2F6FA;border:1.5px solid #A9BACC;border-radius:2px;padding:4px 14px;font-size:.9rem;color:#0F2A44;font-weight:700;white-space:nowrap}
+
+.scen-card{background:#fff;border:1px solid #E3ECF3;border-radius:2px;padding:2rem 2.5rem;margin-bottom:1rem;box-shadow:0 1px 4px rgba(15,42,68,.06)}
+.scen-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1.75rem}
+.scen-left{flex:1}
+.scen-cat{font-size:.875rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:#7C8A99;margin-bottom:.75rem}
+.scen-q{font-size:1.75rem;font-weight:600;color:#0E2A44;line-height:1.5}
+.star-btn{width:4.25rem;height:4.25rem;border-radius:50%;background:#1F95E3;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,transform .15s;box-shadow:0 0 0 8px rgba(31,149,227,.18)}
+.star-btn:hover{background:#1A80C8;transform:scale(1.07)}
+.star-btn.open{background:#0F2A44;box-shadow:0 0 0 8px rgba(13,27,42,.14)}
+
+.agent-drawer{background:#fff;border:2.5px solid #A9BACC;border-radius:2px;margin-bottom:1rem;overflow:hidden}
+.agent-head{background:#0F2A44;padding:1.125rem 1.625rem;display:flex;align-items:center;justify-content:space-between}
+.agent-brand{display:flex;align-items:center;gap:.875rem}
+.agent-star-txt{color:#F5C842;font-size:1.625rem;line-height:1}
+.agent-nm{font-size:1.25rem;font-weight:800;color:#fff}
+.agent-sub-t{font-size:.875rem;color:rgba(255,255,255,.5);margin-top:2px}
+.agent-online{display:flex;align-items:center;gap:5px;font-size:.9rem;color:rgba(255,255,255,.65);font-weight:600}
+.a-dot{width:8px;height:8px;border-radius:50%;background:#4AE0A0}
+.ll-row2{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.625rem;background:rgba(13,27,42,.04);border-bottom:1.5px solid #E3ECF3}
+.ll-lbl2{font-size:1rem;color:#7C8A99;font-weight:600}
+.agent-msgs{padding:1.125rem;display:flex;flex-direction:column;gap:.625rem;max-height:360px;overflow-y:auto}
+.abub{background:#F2F6FA;border-radius:2px 1rem 1rem 1rem;padding:.875rem 1rem;font-size:1.125rem;color:#0E2A44;line-height:1.6;max-width:96%;align-self:flex-start;border:1.5px solid #E3ECF3}
+.ubub{background:#1F95E3;border-radius:2px 4px 1rem 1rem;padding:.875rem 1rem;font-size:1.125rem;color:#fff;line-height:1.6;max-width:96%;align-self:flex-end}
+.think-row{display:none;align-items:center;gap:6px;padding:4px 1.125rem .75rem;font-size:.875rem;color:#1F95E3;font-weight:600}
+.dp span{display:inline-block;width:6px;height:6px;border-radius:50%;background:#1F95E3;animation:dp .9s infinite;margin:0 2px}
+.dp span:nth-child(2){animation-delay:.18s}.dp span:nth-child(3){animation-delay:.36s}
+@keyframes dp{0%,80%,100%{transform:scale(.45);opacity:.3}40%{transform:scale(1);opacity:1}}
+.qa-wrap{padding:.625rem 1rem .375rem;display:flex;flex-direction:column;gap:5px;border-top:1.5px solid #E3ECF3}
+.qa-pill{width:100%;text-align:left;padding:.75rem 1rem;border-radius:2px;border:1.5px solid #E3ECF3;background:#fff;font-size:1rem;color:#0F2A44;cursor:pointer;font-family:inherit;font-weight:600}
+.qa-pill:hover:not(:disabled){background:#F2F6FA;border-color:#1F95E3}
+.qa-pill:disabled{opacity:.3;cursor:default}
+.agent-inp-row{display:flex;gap:.625rem;padding:.75rem 1rem 1rem;border-top:1.5px solid #E3ECF3}
+.agent-inp{flex:1;padding:.875rem 1.125rem;border-radius:2px;border:1.5px solid #E3ECF3;background:#F2F6FA;font-size:1rem;color:#0E2A44;font-family:inherit}
+.agent-inp:focus{outline:none;border-color:#1F95E3;background:#fff}
+.agent-inp:disabled{opacity:.35}
+.send-btn{padding:.875rem 1.625rem;border-radius:2px;border:none;background:#1F95E3;color:#fff;font-size:1rem;font-weight:800;cursor:pointer;font-family:inherit}
+.send-btn:hover{background:#1A80C8}
+.send-btn:disabled{opacity:.3;cursor:default}
+.no-ll{text-align:center;padding:.625rem;font-size:.875rem;color:#7C8A99;border-top:1.5px solid #E3ECF3}
+
+.vendor-card{background:#F4F7FA;border-radius:2px;padding:1.5rem 2.25rem;margin-bottom:1rem;box-shadow:0 1px 4px rgba(15,42,68,.05)}
+.scan-tag{display:inline-flex;align-items:center;gap:5px;background:#F2F6FA;border:1.5px solid #A9BACC;border-radius:2px;padding:4px 12px;font-size:.875rem;color:#0F2A44;font-weight:800;margin-bottom:1rem}
+.pulse{width:8px;height:8px;border-radius:50%;background:#1F95E3;display:inline-block;animation:pu 1.8s ease-in-out infinite}
+@keyframes pu{0%,100%{opacity:.3}50%{opacity:1}}
+.vc-head{display:flex;align-items:center;gap:1.125rem;margin-bottom:1.125rem}
+.vc-av{width:3.5rem;height:3.5rem;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;font-weight:900;flex-shrink:0}
+.vc-nm{font-size:1.375rem;font-weight:800;color:#0F2A44;margin-bottom:3px}
+.vc-ty{font-size:1rem;color:#7C8A99}
+.risk-pill{display:inline-flex;align-items:center;gap:4px;border-radius:2px;padding:5px 14px;font-size:.875rem;font-weight:900;margin-left:auto;flex-shrink:0}
+.rh{background:#FCEBEB;color:#791F1F;border:1.5px solid #F09595}
+.rm{background:#FAEEDA;color:#633806;border:1.5px solid #FAC775}
+.rl2{background:#E1F5EE;color:#085041;border:1.5px solid #9FE1CB}
+.vc-hr{height:1.5px;background:#EEF2FA;margin-bottom:1.125rem}
+.stats-g{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
+.stat{background:#EEF2FA;border-radius:2px;padding:.875rem 1rem}
+.stat-l{font-size:.75rem;color:#7C8A99;margin-bottom:3px;display:flex;align-items:center;gap:3px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.stat-v{font-size:1rem;font-weight:800;line-height:1.3}
+.sv-h{color:#791F1F}.sv-m{color:#633806}.sv-l{color:#0F6E56}
+
+.choices{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1rem}
+.ch{width:100%;text-align:left;padding:1.25rem 1.625rem;border-radius:2px;border:2px solid #E3ECF3;background:#fff;font-size:1.375rem;color:#0E2A44;cursor:pointer;font-family:inherit;line-height:1.4;display:flex;align-items:flex-start;gap:1rem;font-weight:600;transition:all .1s}
+.ch:hover:not(:disabled){background:#F2F6FA;border-color:#1F95E3}
+.ch:disabled{cursor:default}
+.ch-idx{width:2rem;height:2rem;border-radius:50%;border:2.5px solid #E3ECF3;display:flex;align-items:center;justify-content:center;font-size:.875rem;font-weight:900;color:#7C8A99;flex-shrink:0;margin-top:2px}
+.ch.correct{background:#E1F5EE;border-color:#0F6E56;color:#04342C}
+.ch.correct .ch-idx{background:#0F6E56;border-color:#0F6E56;color:#fff}
+.ch.wrong{background:#FCEBEB;border-color:#A32D2D;color:#501313}
+.ch.wrong .ch-idx{background:#A32D2D;border-color:#A32D2D;color:#fff}
+.ch.reveal{background:#E1F5EE;border-color:#085041;color:#04342C;opacity:.65}
+.ch.reveal .ch-idx{background:#085041;border-color:#085041;color:#fff}
+
+.fb{border-radius:2px;padding:1.25rem 1.625rem;font-size:1.1875rem;line-height:1.6;margin-bottom:1rem;display:flex;align-items:flex-start;gap:.875rem;font-weight:600}
+.fb-ic{font-size:1.75rem;flex-shrink:0;margin-top:2px}
+.fb.correct{background:#E1F5EE;color:#04342C;border:2px solid #0F6E56}
+.fb.wrong{background:#FCEBEB;color:#501313;border:2px solid #A32D2D}
+.fb.timeout{background:#FAEEDA;color:#412402;border:2px solid #EF9F27}
+.pts-badge{display:inline-block;background:#1F95E3;color:#fff;border-radius:2px;padding:2px 12px;font-size:.875rem;font-weight:700;margin-right:7px;font-family:'Consolas',ui-monospace,monospace}
+.nxt-btn{width:100%;padding:1.375rem;font-size:1.5rem;font-weight:900;border-radius:2px;border:none;background:#1F95E3;color:#fff;cursor:pointer;font-family:inherit}
+.nxt-btn:hover{background:#1A80C8}
+
+.win-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);align-items:center;justify-content:center;z-index:200}
+.win-overlay.show{display:flex}
+.win-modal{background:#fff;border-radius:2px;padding:3.5rem 4rem;text-align:center;max-width:520px;width:92%}
+.win-socks{font-size:5rem;margin-bottom:.875rem;line-height:1}
+.win-modal h2{font-size:2.5rem;font-weight:900;color:#0F2A44;margin-bottom:.75rem;line-height:1.1}
+.win-modal p{font-size:1.25rem;color:#7C8A99;line-height:1.6;margin-bottom:1.5rem}
+.win-pill{display:inline-block;background:#0F2A44;color:#F5C842;border-radius:2px;padding:.875rem 2rem;font-size:1.375rem;font-weight:900;margin-bottom:2rem}
+.win-close{padding:1.125rem 2.5rem;font-size:1.1rem;font-weight:700;border-radius:2px;border:2px solid #E3ECF3;background:transparent;color:#0F2A44;cursor:pointer;font-family:inherit}
+.win-close:hover{background:#F2F6FA}
+
+.result-hero{background:#0E2A44;padding:3.5rem 3.75rem;display:flex;align-items:center;justify-content:space-between;gap:2.5rem}
+.rh-lft h2{font-size:2.5rem;font-weight:400;color:#fff;margin-bottom:.75rem;line-height:1.1;font-family:'Georgia',serif}
+.rh-lft p{font-size:1.25rem;color:rgba(255,255,255,.6);line-height:1.65;max-width:480px}
+.rh-score-box{background:rgba(255,255,255,.07);border-radius:2px;padding:2rem 2.75rem;text-align:center;flex-shrink:0}
+.rh-score-n{font-size:4.5rem;font-weight:900;color:#F5C842;line-height:1;margin-bottom:5px}
+.rh-score-lbl{font-size:.75rem;color:rgba(255,255,255,.45);letter-spacing:.1em;text-transform:uppercase;font-weight:700;font-family:'Consolas',ui-monospace,monospace}
+.result-body{background:#EEF2FA;padding:2.5rem 3.75rem 3.5rem}
+.result-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:.875rem;margin-bottom:1.5rem}
+.rs{background:#F4F7FA;border-radius:2px;padding:1.25rem;text-align:center}
+.rs-v{font-size:2.25rem;font-weight:900;color:#0F2A44}
+.rs-l{font-size:.7rem;color:#7C8A99;margin-top:3px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;font-family:'Consolas',ui-monospace,monospace}
+.result-bottom{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+.prize-box{background:#0F2A44;border-radius:2px;padding:2rem;display:flex;align-items:center;gap:1.25rem}
+.prize-icon-big{font-size:3.5rem;flex-shrink:0}
+.prize-lbl{font-size:.875rem;color:rgba(255,255,255,.5);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;font-weight:700}
+.prize-val{font-size:1.5rem;font-weight:900;color:#F5C842;line-height:1.25}
+.cta-box{background:#fff;border-radius:2px;padding:2rem;display:flex;flex-direction:column;justify-content:space-between;border:2px solid #E3ECF3}
+.cta-box p{font-size:1.125rem;color:#7C8A99;margin-bottom:1.25rem;line-height:1.6}
+.play-btn{width:100%;padding:1.25rem;font-size:1.375rem;font-weight:900;border-radius:2px;border:none;background:#1F95E3;color:#fff;cursor:pointer;font-family:inherit}
+.play-btn:hover{background:#1A80C8}
+.back-btn{display:inline-flex;align-items:center;gap:6px;padding:.875rem 1.75rem;font-size:1.125rem;font-weight:700;border-radius:2px;border:2px solid #E3ECF3;background:transparent;color:#0F2A44;cursor:pointer;font-family:inherit;margin-top:.875rem;width:100%;justify-content:center}
+.back-btn:hover{background:#F2F6FA}
+
+/* ── OAN ASSIST SOP UI ── */
+.agent-sop-btn,.agent-ans-btn{
+  width:100%;text-align:left;padding:1rem 1.25rem;border-radius:2px;border:none;
+  cursor:pointer;font-family:inherit;font-weight:700;font-size:1.0625rem;
+  display:flex;align-items:center;justify-content:space-between;gap:.75rem;
+  margin-top:.375rem;transition:all .15s;
+}
+.agent-sop-btn{background:#1F95E3;color:#fff;}
+.agent-sop-btn:hover:not(:disabled){background:#1A80C8;}
+.agent-ans-btn{background:#0F2A44;color:#fff;}
+.agent-ans-btn:hover:not(:disabled){background:#1A3058;}
+.agent-sop-btn:disabled,.agent-ans-btn:disabled{opacity:.35;cursor:default;}
+.agent-sop-btn .ti,.agent-ans-btn .ti{font-size:1.25rem;flex-shrink:0;}
+.agent-sop-cost{font-size:.75rem;font-weight:600;opacity:.65;margin-left:auto;white-space:nowrap;}
+
+/* SOP card */
+.sop-card{background:#F8F9FC;border:2px solid #E3ECF3;border-radius:2px;padding:1.25rem 1.375rem;margin-top:.375rem;}
+.sop-title{font-size:1.0625rem;font-weight:900;color:#0F2A44;display:flex;align-items:center;gap:.5rem;margin-bottom:.375rem;}
+.sop-title .ti{color:#1F95E3;font-size:1.1rem;}
+.sop-ref{font-size:.75rem;font-weight:700;color:#7C8A99;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.875rem;}
+.sop-steps-lbl{font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#1F95E3;margin-bottom:.5rem;}
+.sop-steps{list-style:none;padding:0;display:flex;flex-direction:column;gap:.5rem;}
+.sop-steps li{display:flex;align-items:flex-start;gap:.625rem;font-size:.9375rem;color:#0F2A44;font-weight:600;line-height:1.45;padding:.625rem .875rem;background:#fff;border-radius:2px;border:1.5px solid #F2F6FA;}
+.sop-steps li::before{content:counter(li);counter-increment:li;width:1.5rem;height:1.5rem;border-radius:50%;background:#1F95E3;color:#fff;font-size:.7rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.sop-steps{counter-reset:li;}
+.sop-escalate{margin-top:.875rem;padding:.75rem 1rem;background:#FCEBEB;border:1.5px solid #F09595;border-radius:2px;font-size:.875rem;color:#791F1F;font-weight:600;line-height:1.5;display:flex;align-items:flex-start;gap:.5rem;}
+.sop-escalate .ti{flex-shrink:0;margin-top:1px;}
+
+/* Answer card */
+.ans-card{background:#0F2A44;border-radius:2px;padding:1.25rem 1.375rem;margin-top:.375rem;}
+.ans-lbl{font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#F5C842;margin-bottom:.75rem;}
+.ans-choice{font-size:1rem;font-weight:700;color:#fff;line-height:1.5;border-left:3px solid #F5C842;padding-left:.875rem;margin-bottom:.75rem;}
+.ans-why{font-size:.875rem;color:rgba(255,255,255,.72);line-height:1.6;margin-bottom:.875rem;}
+.ans-go-btn{width:100%;padding:.875rem;border-radius:2px;border:none;background:#1F95E3;color:#fff;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:.5rem;}
+.ans-go-btn:hover{background:#1A80C8;}
+
+/* Level card — colored left-border accents + lift on hover */
+.level-card{border-left:4px solid #E3ECF3;transition:all .18s ease-out;position:relative;overflow:hidden}
+.level-card.beginner{border-left-color:#0F6E56}
+.level-card.advanced{border-left-color:#854F0B}
+.level-card.expert{border-left-color:#A32D2D}
+.level-card.supplier{border-left-color:#0F2A44}
+.level-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(31,149,227,.12)}
+
+/* ── OAN ASSIST SIDEBAR ── */
+#agentDrawer{
+  position:fixed;top:5rem;right:0;
+  width:420px;max-width:90vw;
+  max-height:calc(100vh - 5rem);
+  z-index:300;
+  transform:translateX(110%);
+  transition:transform .36s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;
+  display:flex!important;flex-direction:column;
+}
+#agentDrawer.open{transform:translateX(0);pointer-events:all}
+#agentDrawer .agent-drawer{
+  display:flex;flex-direction:column;
+  max-height:calc(100vh - 5rem);
+  margin-bottom:0;
+  border-radius:0 0 0 2px;
+  box-shadow:-16px 0 48px rgba(6,17,30,.2);
+  border:2.5px solid #A9BACC;border-right:none;border-top:none;
+  overflow:hidden;
+}
+#agentDrawer .agent-msgs{flex:1;min-height:0;overflow-y:auto;max-height:none}
+
+/* Backdrop — click-to-close only, no visual overlay */
+.agent-backdrop{
+  position:fixed;inset:0;
+  z-index:299;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s;
+}
+.agent-backdrop.open{opacity:1;pointer-events:all}
+
+/* Close button in sidebar header */
+.agent-close-btn{
+  background:rgba(255,255,255,.12);border:none;
+  width:34px;height:34px;border-radius:50%;
+  color:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.0625rem;transition:background .15s;flex-shrink:0;
+  margin-left:.5rem;
+}
+.agent-close-btn:hover{background:rgba(255,255,255,.28)}
+
+/* ── ENHANCEMENTS: ANIMATIONS ── */
+@keyframes slideInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes wrongShake{0%,100%{transform:translateX(0)}15%{transform:translateX(-7px)}30%{transform:translateX(7px)}45%{transform:translateX(-5px)}60%{transform:translateX(5px)}75%{transform:translateX(-2px)}90%{transform:translateX(2px)}}
+@keyframes correctPop{0%{box-shadow:0 0 0 0 rgba(15,110,86,.45)}70%{box-shadow:0 0 0 14px rgba(15,110,86,0)}100%{box-shadow:0 0 0 0 rgba(15,110,86,0)}}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1)}70%{opacity:1;transform:translateY(-55px) scale(1.1)}100%{opacity:0;transform:translateY(-75px) scale(.9)}}
+@keyframes dangerPulse{0%,100%{border-color:#E3ECF3;box-shadow:none}50%{border-color:#E24B4A;box-shadow:0 0 0 3px rgba(226,75,74,.18)}}
+@keyframes streakBounce{0%{transform:scale(1)}35%{transform:scale(1.3)}65%{transform:scale(.97)}100%{transform:scale(1)}}
+@keyframes cfFall{0%{transform:translateY(0) rotateZ(0deg);opacity:1}100%{transform:translateY(700px) rotateZ(540deg);opacity:0}}
+@keyframes revealIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@keyframes shimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes riskPulse{0%,100%{box-shadow:0 0 0 0 rgba(163,45,45,0)}50%{box-shadow:0 0 0 6px rgba(163,45,45,.18)}}
+
+/* Card entrance */
+.scen-card{animation:slideInUp .28s ease-out both}
+.vendor-card{animation:slideInUp .32s .04s ease-out both}
+.choices{animation:slideInUp .32s .08s ease-out both}
+.ch.correct{animation:correctPop .55s ease-out}
+.ch.wrong{animation:wrongShake .4s ease-out}
+
+/* Improved choice hover */
+.ch{transition:all .12s ease-out}
+.ch:hover:not(:disabled){background:#F2F6FA;border-color:#1F95E3;transform:translateX(3px)}
+
+/* Streak badge */
+.streak-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;margin-right:.25rem}
+.streak-lbl{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#7C8A99}
+.streak-badge{display:inline-flex;align-items:center;gap:.3rem;background:#FEBC2E;color:#0F2A44;border-radius:2px;padding:.3rem .875rem;font-size:.875rem;font-weight:900;opacity:0;transition:all .25s;transform:scale(.8);min-width:56px;justify-content:center}
+.streak-badge.active{opacity:1;transform:scale(1)}
+.streak-badge.pop{animation:streakBounce .35s ease-out}
+.streak-num{font-size:1.2rem;font-weight:900}
+
+/* Floating score popup */
+.float-pts{position:fixed;pointer-events:none;font-size:1.625rem;font-weight:900;color:#1F95E3;text-shadow:0 1px 6px rgba(0,0,0,.12);z-index:500;animation:floatUp .85s ease-out forwards;white-space:nowrap;font-family:'Consolas',ui-monospace,monospace}
+
+/* Timer danger zone */
+.timer-row.danger{animation:dangerPulse .55s ease-in-out infinite}
+
+/* HIGH risk vendor card pulse */
+.vendor-card.risk-high{animation:riskPulse 2.2s ease-in-out infinite}
+
+/* Confetti stage */
+.confetti-stage{position:fixed;inset:0;pointer-events:none;z-index:250;overflow:hidden}
+.cf{position:absolute;top:-12px;border-radius:2px;animation:cfFall linear forwards}
+
+/* Streak toast */
+.streak-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(15,42,68,.92);color:#FEBC2E;font-size:1.875rem;font-weight:900;padding:.875rem 2.25rem;border-radius:2px;z-index:450;pointer-events:none;letter-spacing:.03em;animation:revealIn .2s ease-out,floatUp 1s .65s ease-out forwards;white-space:nowrap;border:2px solid rgba(254,188,46,.3)}
+
+/* Animated start hero */
+.start-hero{background:#0F2A44;padding:3.5rem 3.75rem 4rem;text-align:center}
+
+/* Host character */
+.host-row{display:flex;justify-content:center;margin-top:2rem}
+.host-card{display:flex;align-items:center;gap:1.25rem;background:rgba(255,255,255,.07);border-left:3px solid #1F95E3;border-radius:2px;padding:1.125rem 1.75rem;max-width:540px;text-align:left}
+.host-img{width:60px;height:60px;border-radius:50%;object-fit:cover;flex-shrink:0;border:3px solid #1F95E3;background:#fff}
+.host-speech{color:rgba(255,255,255,.8);font-size:1rem;line-height:1.55}
+.host-speech strong{color:#1F95E3;display:block;margin-bottom:4px;font-size:1.0625rem}
+.agent-host-img{width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #1F95E3;background:#fff}
+
+/* Dark win modal */
+.win-modal{background:#0E2A44;border:2px solid rgba(245,200,66,.25);border-radius:2px;padding:3.5rem 4rem;text-align:center;max-width:540px;width:92%}
+.win-modal h2{color:#fff;font-family:'Georgia',serif;font-weight:400}
+.win-modal p{color:rgba(255,255,255,.65)}
+.win-pill{background:rgba(245,200,66,.12);color:#F5C842;border:1.5px solid rgba(245,200,66,.3);border-radius:2px;padding:.875rem 2rem;font-size:1.375rem;font-weight:900;display:inline-block}
+.win-close{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.2);padding:1.125rem 2.5rem;font-size:1.1rem;font-weight:700;border-radius:2px;border:2px solid;cursor:pointer;font-family:inherit}
+.win-close:hover{background:rgba(255,255,255,.15)}
+.win-rank{font-size:.75rem;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.875rem;font-family:'Consolas',ui-monospace,monospace}
+.win-rank-val{display:inline-block;background:rgba(245,200,66,.15);color:#F5C842;border:1.5px solid rgba(245,200,66,.4);border-radius:2px;padding:3px 16px}
+.win-host-row{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1.25rem}
+.win-host-img{width:70px;height:70px;border-radius:50%;object-fit:cover;border:3px solid #F5C842;background:#fff}
+.win-socks{font-size:3.5rem;line-height:1;margin-bottom:.5rem}
+
+/* Level card icon boxes */
+.lc-icon-box{width:4rem;height:4rem;border-radius:2px;display:flex;align-items:center;justify-content:center;margin:0 auto .875rem;font-size:2.125rem}
+.lci-b{background:#E1F5EE;color:#0F6E56}
+.lci-a{background:#FAEEDA;color:#854F0B}
+.lci-e{background:#FCEBEB;color:#A32D2D}
+.lci-s{background:#F2F6FA;color:#0F2A44}
+
+/* Trophy in win modal */
+.win-trophy{margin-bottom:.5rem;line-height:1}
+.win-trophy .ti{font-size:4.5rem;color:#F5C842}
+
+/* Icon sizes in result cards */
+.rank-icon .ti{font-size:2.5rem}
+.prize-icon-big .ti{font-size:3.5rem}
+.prize-icon-big{color:#F5C842}
+
+/* ── SCREEN TRANSITIONS ── */
+@keyframes screenIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.screen-enter{animation:screenIn .38s ease-out both}
+
+/* ── START SCREEN ENTRANCE ANIMATIONS ── */
+.hero-logo-row{animation:slideInUp .45s .05s ease-out both}
+.hero-h1{animation:slideInUp .45s .12s ease-out both}
+.hero-tagline{animation:slideInUp .45s .2s ease-out both}
+.host-row{animation:slideInUp .45s .28s ease-out both}
+.rules{animation:slideInUp .4s .15s ease-out both}
+.level-cards{animation:slideInUp .4s .25s ease-out both}
+.go-btn{animation:slideInUp .4s .35s ease-out both}
+
+/* Glowing start button */
+@keyframes glowBtn{0%,100%{box-shadow:0 4px 18px rgba(31,149,227,.25)}50%{box-shadow:0 6px 28px rgba(31,149,227,.5)}}
+.go-btn:not([disabled]){animation:glowBtn 2.2s ease-in-out infinite}
+
+/* Score pop when updated */
+@keyframes scorePop{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+.score-pop{animation:scorePop .3s ease-out}
+
+/* ── CHOICE BUTTON HOVER — left-bar accent ── */
+.ch{position:relative;overflow:hidden}
+.ch::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:#1F95E3;transform:scaleY(0);transform-origin:center;transition:transform .15s ease-out;border-radius:0 0 0 0}
+.ch:hover:not(:disabled)::before{transform:scaleY(1)}
+.ch:hover:not(:disabled){background:#F2F6FA;border-color:#1F95E3;transform:translateX(5px);box-shadow:-3px 0 0 0 #1F95E3}
+.ch:hover:not(:disabled) .ch-idx{border-color:#1F95E3;color:#1F95E3}
+
+/* ── VENDOR CARD — risk-level top border ── */
+.vendor-card.risk-high{border-top:3px solid #A32D2D}
+.vendor-card.risk-med{border-top:3px solid #EF9F27}
+.vendor-card.risk-low{border-top:3px solid #0F6E56}
+
+/* ── QUESTION CARD — stronger visual hierarchy ── */
+.scen-cat{display:inline-flex;align-items:center;gap:.4rem;background:#F2F6FA;color:#1F95E3;border-radius:2px;padding:.3rem .875rem;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.875rem;font-family:'Consolas',ui-monospace,monospace}
+.scen-q{font-size:1.625rem;font-weight:700;color:#0E2A44;line-height:1.5}
+
+/* ── LEVEL CARD IMPROVEMENTS ── */
+.level-card{position:relative;overflow:hidden}
+.level-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(to right,transparent,rgba(255,255,255,.4),transparent);opacity:0;transition:opacity .2s}
+.level-card:hover::after{opacity:1}
+
+/* ── HUD improvements ── */
+.hud-score-n{font-size:2.75rem}
+
+/* Nav online dot */
+.nav-dot{animation:blink 1.5s ease-in-out infinite}
+
+/* ── TIMER — more dramatic pulsing ── */
+@keyframes timerTickRed{0%,100%{opacity:1}50%{opacity:.6}}
+.t-cd.urgent{animation:timerTickRed .5s ease-in-out infinite}
+
+/* ── RESULT SCREEN STATS — staggered entrance ── */
+.result-stats .rs:nth-child(1){animation:slideInUp .35s .05s ease-out both}
+.result-stats .rs:nth-child(2){animation:slideInUp .35s .1s ease-out both}
+.result-stats .rs:nth-child(3){animation:slideInUp .35s .15s ease-out both}
+.result-stats .rs:nth-child(4){animation:slideInUp .35s .2s ease-out both}
+.result-stats .rs:nth-child(5){animation:slideInUp .35s .25s ease-out both}
+
+/* Rank card in results */
+.rank-card{background:#0F2A44;border-radius:2px;padding:1.5rem 2rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:1.5rem;animation:revealIn .4s ease-out}
+.rank-icon{font-size:3rem;line-height:1;flex-shrink:0}
+.rank-title{font-size:1.625rem;font-weight:900;color:#F5C842;line-height:1}
+.rank-sub{font-size:.9375rem;color:rgba(255,255,255,.55);margin-top:4px}
+.rank-score-chip{margin-left:auto;background:rgba(245,200,66,.1);border:1.5px solid rgba(245,200,66,.3);border-radius:2px;padding:.75rem 1.25rem;text-align:center;flex-shrink:0}
+.rank-score-n{font-size:2rem;font-weight:900;color:#F5C842;line-height:1}
+.rank-score-l{font-size:.7rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-top:2px}
+
+/* ── OAN ASSIST INSIGHT CARD ── */
+.insight-card{background:#F4F7FA;border-left:3px solid #1F95E3;padding:1rem;margin-bottom:.5rem}
+.insight-vendor-head{display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem}
+.insight-vendor-nm{font-size:1rem;font-weight:800;color:#0F2A44}
+.insight-vendor-ty{font-size:.8rem;color:#7C8A99;margin-top:2px}
+.insight-scan-row{margin-bottom:.75rem}
+.insight-stats{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.75rem}
+.insight-stat{background:#fff;padding:.5rem .625rem;border-left:2px solid #E3ECF3}
+.insight-stat .stat-l{font-size:.7rem;color:#7C8A99;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:3px;margin-bottom:2px;font-family:'Consolas',ui-monospace,monospace}
+.insight-stat .stat-v{font-size:.875rem;font-weight:700;line-height:1.3}
+.insight-ai-text{background:#fff;border-left:2px solid #1F95E3;padding:.75rem 1rem;font-size:.9rem;color:#3A4A5C;line-height:1.55;display:flex;gap:.5rem;margin-bottom:.375rem}
+.insight-ai-text i{color:#1F95E3;font-size:1rem;flex-shrink:0;margin-top:1px}
+
+/* OAN Assist intro message (round 1 only) */
+.oan-intro-msg{background:#0F2A44;color:#fff;padding:1rem 1.125rem;margin-bottom:.5rem;border-left:3px solid #1F95E3}
+.oan-intro-msg strong{color:#1F95E3;display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:1rem}
+.oan-intro-msg p{font-size:.9rem;color:rgba(255,255,255,.8);line-height:1.55;margin:0}
+
+/* Agent toggle button — now the OAN Assist toggle */
+.star-btn{background:#1F95E3}
+.star-btn.open{background:#0F2A44}
+
+/* Section label inside OAN Assist */
+.insight-section-lbl{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#7C8A99;font-family:'Consolas',ui-monospace,monospace;padding:.375rem 1.125rem .25rem;border-top:1px solid #E3ECF3;margin-top:.25rem}
+
+</style>
+</head>
+<body>
+
+<div class="confetti-stage" id="confettiStage"></div>
+
+<div id="sp">
+  <button id="sp-toggle" title="Adjust font size">⚙</button>
+  <div id="sp-box">
+    <label>Display scale</label>
+    <input type="range" id="sp-slider" min="70" max="180" step="5" value="100">
+    <div id="sp-val">100%</div>
+    <div id="sp-presets">
+      <button data-v="100">100%</button>
+      <button data-v="120">120%</button>
+      <button data-v="150">150%</button>
+      <button data-v="180">180%</button>
+    </div>
+  </div>
+</div>
+
+<nav class="nav">
+  <div class="nav-left">
+    <div class="nav-logo-box"><img src="oappsnet-logo.png" alt="oAppsNET" onerror="this.style.display='none'"></div>
+    <div><div class="nav-brand">oAppsNET</div><div class="nav-agent">OAN Fraud Detection Agent</div></div>
+  </div>
+  <div class="nav-badge"><span class="nav-dot"></span> Agent online</div>
+</nav>
+
+<!-- START -->
+<div id="screen-start">
+  <div class="start-hero">
+    <div class="hero-logo-row">
+      <div class="hero-logo-box"><img src="oappsnet-logo.png" alt="oAppsNET" onerror="this.style.display='none'"></div>
+      <div class="hero-divider"></div>
+      <div><div class="hero-brand-name">oAppsNET</div><div class="hero-agent-line">OAN Fraud Detection Agent</div></div>
+    </div>
+    <div class="hero-h1">Test your <span class="gold">Knowledge</span><br>Win a <span class="gold">Prize</span></div>
+    <div class="hero-tagline">Can you spot the fake vendor before it's too late?</div>
+    <div class="host-row">
+      <div class="host-card">
+        <img src="unnamed.png" class="host-img" alt="OAN Expert">
+        <div class="host-speech">
+          <strong>Hi, I'm your AP Fraud Expert — let's play!</strong>
+          Real scenarios, real fraud patterns. Answer 3 correctly and win a prize at the oAppsNET booth.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="start-body">
+    <div class="rules">
+      <div class="rule">
+        <div class="rule-icon-box"><i class="ti ti-shield-check ri" aria-hidden="true"></i></div>
+        <div><div class="rule-t">Read the OAN agent risk signals</div><div class="rule-s">Each vendor card shows live flags — bank changes, address shifts, payment history, anomaly scores</div></div>
+      </div>
+      <div class="rule">
+        <div class="rule-icon-box"><svg class="star-ri" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2C12 2 13.2 7.5 15.5 9.8C17.8 12.1 23 13 23 13C23 13 17.8 13.9 15.5 16.2C13.2 18.5 12 24 12 24C12 24 10.8 18.5 8.5 16.2C6.2 13.9 1 13 1 13C1 13 6.2 12.1 8.5 9.8C10.8 7.5 12 2 12 2Z" fill="#1F95E3"/></svg></div>
+        <div><div class="rule-t">Tap the star — get a hint from OAN Assist</div><div class="rule-s">Stuck? Ask the agent — it pauses the timer and points you to the right answer</div></div>
+      </div>
+      <div class="rule">
+        <div class="rule-icon-box"><i class="ti ti-trophy ri" aria-hidden="true"></i></div>
+        <div><div class="rule-t">3 correct = you win a prize</div><div class="rule-s">Answer 3 or more correctly and collect your reward at the oAppsNET booth</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="level-select-wrap">
+    <div class="level-title">Choose your difficulty level</div>
+    <div class="level-cards">
+      <div class="level-card beginner" data-level="beginner" onclick="selectLevel('beginner')">
+        <div class="lc-icon-box lci-b"><i class="ti ti-shield-check" aria-hidden="true"></i></div>
+        <div class="lc-name">Beginner</div>
+        <div class="lc-desc">Core AP fraud concepts — first-time vendors, duplicate payments, basic red flags</div>
+        <span class="lc-badge b">Entry level</span>
+        <div class="lc-q">5 questions · 90 seconds each</div>
+      </div>
+      <div class="level-card advanced" data-level="advanced" onclick="selectLevel('advanced')">
+        <div class="lc-icon-box lci-a"><i class="ti ti-bolt" aria-hidden="true"></i></div>
+        <div class="lc-name">Advanced</div>
+        <div class="lc-desc">BEC attacks, dormant vendors, payment terms manipulation, multi-signal fraud patterns</div>
+        <span class="lc-badge a">Intermediate</span>
+        <div class="lc-q">5 questions · 60 seconds each</div>
+      </div>
+      <div class="level-card expert" data-level="expert" onclick="selectLevel('expert')">
+        <div class="lc-icon-box lci-e"><i class="ti ti-flame" aria-hidden="true"></i></div>
+        <div class="lc-name">Expert</div>
+        <div class="lc-desc">Complex schemes — collusion, AI-generated invoices, shell companies, split-payment fraud</div>
+        <span class="lc-badge e">AP professional</span>
+        <div class="lc-q">5 questions · 45 seconds each</div>
+      </div>
+      <div class="level-card supplier" data-level="supplier" onclick="selectLevel('supplier')">
+        <div class="lc-icon-box lci-s"><i class="ti ti-building-bank" aria-hidden="true"></i></div>
+        <div class="lc-name">Supplier Identity</div>
+        <div class="lc-desc">OAN + LSEG/GIACT Oracle Fusion agent — bank validation, ESI email risk, OFAC screening, consumer &amp; business identity</div>
+        <span class="lc-badge s">Oracle Fusion agent</span>
+        <div class="lc-q">5 questions · 60 seconds each</div>
+      </div>
+    </div>
+    <button class="go-btn" id="startBtn" disabled><i class="ti ti-player-play" aria-hidden="true"></i> Start the challenge</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="screen-game" style="display:none">
+  <div class="game-body">
+    <div class="hud">
+      <div>
+        <div style="font-size:.875rem;color:#7C8A99;text-transform:uppercase;letter-spacing:.07em;font-weight:800;margin-bottom:4px">Score</div>
+        <span class="hud-score-n" id="scoreVal">0</span><span class="hud-score-d"> / 1,000</span>
+      </div>
+      <div class="hud-sep"></div>
+      <div><div class="hud-round-lbl">Round</div><div class="hud-pips" id="roundPips"></div></div>
+      <div class="hud-ml">
+        <div class="streak-wrap">
+          <span class="streak-lbl">Streak</span>
+          <div id="streakBadge" class="streak-badge"><i class="ti ti-bolt" style="font-size:.9rem;flex-shrink:0" aria-hidden="true"></i><span id="streakNum" class="streak-num"></span></div>
+        </div>
+        <div class="hud-sep"></div>
+        <div id="diffBadge" class="diff-badge diff-b">Beginner</div>
+        <div class="ll-pips" id="llPips"></div>
+        <span class="ll-txt" id="llTxt">3 hints</span>
+      </div>
+    </div>
+    <div class="timer-row">
+      <i class="ti ti-clock" style="font-size:1.375rem;color:#7C8A99" aria-hidden="true"></i>
+      <div class="t-bar"><div class="t-fill" id="timerFill" style="width:100%;background:#1D9E75"></div></div>
+      <div class="t-cd" id="timerCd">90s</div>
+      <div class="paused-tag" id="pausedTag"><i class="ti ti-player-pause" style="font-size:.875rem" aria-hidden="true"></i> Paused — OAN agent helping</div>
+    </div>
+    <div class="scen-card">
+      <div class="scen-card-top">
+        <div class="scen-left">
+          <div class="scen-cat" id="scenCat">Loading</div>
+          <div class="scen-q" id="scenQ"></div>
+        </div>
+        <button class="star-btn" id="agentToggle" aria-label="Toggle OAN Assist">
+          <i class="ti ti-message-circle-2" id="agentBtnIcon" style="font-size:1.6rem;color:#fff" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+    <div class="agent-backdrop" id="agentBackdrop"></div>
+    <div id="agentDrawer">
+      <div class="agent-drawer">
+        <div class="agent-head">
+          <div class="agent-brand"><img src="unnamed.png" class="agent-host-img" alt="OAN Expert"><div><div class="agent-nm">OAN Assist</div><div class="agent-sub-t" id="agentSubT">Invoice analysis ready</div></div></div>
+          <div style="display:flex;align-items:center;gap:.25rem">
+            <div class="agent-online"><span class="a-dot"></span> Online</div>
+            <button class="agent-close-btn" id="agentCloseBtn" aria-label="Close OAN Assist"><i class="ti ti-x" aria-hidden="true"></i></button>
+          </div>
+        </div>
+        <div class="ll-row2"><span class="ll-lbl2" id="llLbl">3 hints remaining</span><div class="ll-pips" id="llPips2"></div></div>
+        <div class="agent-msgs" id="agentMsgs"></div>
+        <div class="think-row" id="thinkRow"><span class="dp"><span></span><span></span><span></span></span> OAN agent analyzing...</div>
+        <div class="qa-wrap" id="quickAsks"></div>
+        <div class="agent-inp-row"><input class="agent-inp" id="agentInp" placeholder="Ask the OAN agent anything..."><button class="send-btn" id="agentSend">Send</button></div>
+        <div class="no-ll" id="noLl" style="display:none">No hints remaining</div>
+      </div>
+    </div>
+    <div id="vendorWrap"></div>
+    <div class="choices" id="choices"></div>
+    <div class="fb" id="feedback" style="display:none"></div>
+    <button class="nxt-btn" id="nextBtn" style="display:none">Next question <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
+  </div>
+</div>
+
+<div class="win-overlay" id="winOverlay">
+  <div class="win-modal">
+    <div class="win-host-row">
+      <img src="unnamed.png" class="win-host-img" alt="OAN Expert">
+    </div>
+    <div class="win-trophy"><i class="ti ti-trophy" aria-hidden="true"></i></div>
+    <div class="win-rank">You earned: <span class="win-rank-val" id="winRankVal">Fraud Fighter</span></div>
+    <h2>You win!</h2>
+    <p>3 or more correct! Your AP fraud instincts are sharp. Head to the oAppsNET booth right now to claim your prize.</p>
+    <div class="win-pill">🧦 oAppsNET socks — claim at the booth</div><br>
+    <button class="win-close" id="winClose">See your full results →</button>
+  </div>
+</div>
+
+<div id="screen-result" style="display:none">
+  <div class="result-hero">
+    <div class="rh-lft"><h2 id="rTitle">You win!</h2><p id="rMsg">Head to the booth to claim your prize.</p></div>
+    <div class="rh-score-box"><div class="rh-score-n" id="rScoreN">0</div><div class="rh-score-lbl">out of 1,000 pts</div></div>
+  </div>
+  <div class="result-body">
+    <div class="rank-card" id="rankCard">
+      <div class="rank-icon" id="rankIcon">🛡️</div>
+      <div>
+        <div class="rank-title" id="rankTitle">Fraud Fighter</div>
+        <div class="rank-sub" id="rankSub">Prize winner! Your instincts are protecting the organization</div>
+      </div>
+      <div class="rank-score-chip">
+        <div class="rank-score-n" id="rankScoreN">0</div>
+        <div class="rank-score-l">points</div>
+      </div>
+    </div>
+    <div class="result-stats">
+      <div class="rs"><div class="rs-v" id="rCorrect">0</div><div class="rs-l">Correct</div></div>
+      <div class="rs"><div class="rs-v" id="rMissed">0</div><div class="rs-l">Missed</div></div>
+      <div class="rs"><div class="rs-v" id="rCalls">0</div><div class="rs-l">Hints used</div></div>
+      <div class="rs"><div class="rs-v" id="rAvg">0</div><div class="rs-l">Avg pts/q</div></div>
+      <div class="rs"><div class="rs-v" id="rLevel">—</div><div class="rs-l">Level</div></div>
+    </div>
+    <div class="result-bottom">
+      <div class="prize-box"><div class="prize-icon-big" id="rPrizeIcon">🧦</div><div><div class="prize-lbl">Your prize</div><div class="prize-val" id="rPrizeVal">oAppsNET socks</div></div></div>
+      <div class="cta-box">
+        <p id="rCtaMsg">Visit the oAppsNET booth to collect your prize and see the OAN fraud agent live in Oracle ERP.</p>
+        <button class="play-btn" id="restartBtn"><i class="ti ti-refresh" aria-hidden="true"></i> Play again — same level</button>
+        <button class="back-btn" id="changeLevelBtn"><i class="ti ti-arrow-left" aria-hidden="true"></i> Change difficulty level</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── SCALE ── */
+(function(){
+  var t=document.getElementById('sp-toggle'),b=document.getElementById('sp-box'),sl=document.getElementById('sp-slider'),vl=document.getElementById('sp-val');
+  t.addEventListener('click',function(){b.classList.toggle('open');});
+  function set(v){document.documentElement.style.setProperty('--s',v/100);sl.value=v;vl.textContent=v+'%';document.querySelectorAll('#sp-presets button').forEach(function(x){x.classList.toggle('act',parseInt(x.dataset.v)===v);});}
+  sl.addEventListener('input',function(){set(parseInt(this.value));});
+  document.querySelectorAll('#sp-presets button').forEach(function(x){x.addEventListener('click',function(){set(parseInt(this.dataset.v));});});
+  set(100);
+})();
+
+/* ── LEVEL SELECT ── */
+var selectedLevel=null;
+function selectLevel(lvl){
+  selectedLevel=lvl;
+  document.querySelectorAll('.level-card').forEach(function(c){c.classList.remove('selected');});
+  document.querySelector('.level-card[data-level="'+lvl+'"]').classList.add('selected');
+  document.getElementById('startBtn').disabled=false;
+}
+
+/* ── QUESTION BANK ── */
+var ALL_QUESTIONS={
+
+beginner:[
+{category:"First-time vendor",question:"A new vendor submitted their first invoice for $8,200 for office supplies. They completed onboarding yesterday and submitted a W-9. The OAN agent shows no payment history. What should AP do?",
+vendor:{name:"Brightfield Office Solutions",type:"Office supplies",avatar:"BO",ab:"#E3ECF3",ac:"#0F2A44",
+stats:[{i:"ti-history",l:"Payment history",v:"None — first invoice",r:"h"},{i:"ti-calendar",l:"Vendor since",v:"Onboarded yesterday",r:"h"},{i:"ti-building-bank",l:"Bank account",v:"New ACH — unverified",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"72 / 100 — HIGH",r:"h"},{i:"ti-license",l:"W-9 status",v:"Submitted — EIN unverified",r:"m"},{i:"ti-map-pin",l:"Address verified",v:"Not confirmed",r:"m"}],rl:"h",
+hint:"Risk score 72 out of 100. The vendor was onboarded yesterday with zero payment history. The EIN has not been cross-checked with IRS records and the bank account is unverified.",
+advice:"Place this invoice on hold and verify the vendor out-of-band. Call the contact phone number on file and confirm the EIN with the IRS before releasing any payment, even though the amount is under $10K."},
+choices:["Approve — W-9 received and amount is low risk","Hold and verify the vendor out-of-band before paying","Pay immediately — small invoices are low risk","Reject — new vendors cannot be paid on first invoice"],correct:1,
+explain:"All first-time vendor invoices require out-of-band verification regardless of amount. A W-9 alone does not confirm the vendor is legitimate."},
+
+{category:"Duplicate payment",question:"The OAN agent flagged that invoice INV-2024-1122 for $3,450 was already paid 10 days ago. The same vendor is now requesting payment again via email. What do you do?",
+vendor:{name:"Metro Print Services",type:"Commercial printing",avatar:"MP",ab:"#E1F5EE",ac:"#0F6E56",
+stats:[{i:"ti-history",l:"Payment history",v:"8 invoices — $24K paid",r:"l"},{i:"ti-copy",l:"Duplicate detected",v:"INV-2024-1122 paid 10 days ago",r:"h"},{i:"ti-mail",l:"Resubmit channel",v:"Email — different sender",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"78 / 100 — HIGH",r:"h"},{i:"ti-currency-dollar",l:"Amount",v:"$3,450 — exact match",r:"m"},{i:"ti-inbox",l:"Original channel",v:"Vendor portal",r:"l"}],rl:"h",
+hint:"OAN matched this exact invoice number and amount to a payment made 10 days ago via the vendor portal. The second request came from a different email address than the original submission.",
+advice:"Flag as a duplicate and contact the vendor directly via a known phone number to confirm they received the original payment. Do not pay again. The different sender email is a red flag."},
+choices:["Pay again — the vendor may not have received the first","Flag as duplicate and contact vendor to confirm prior receipt","Approve a partial payment as a precaution","Ignore — small amounts are not worth investigating"],correct:1,
+explain:"OAN matched the exact invoice to a prior payment. Contact the vendor directly to confirm receipt. The different email sender indicates potential fraud."},
+
+{category:"Vendor master data",question:"An AP clerk receives a call from someone claiming to be a vendor requesting an update to their mailing address. No email or portal request has been submitted. What should AP do?",
+vendor:{name:"Lakeside Facilities Group",type:"Facilities management",avatar:"LF",ab:"#FAEEDA",ac:"#633806",
+stats:[{i:"ti-history",l:"Payment history",v:"22 invoices — $187K paid",r:"l"},{i:"ti-map-pin",l:"Address change",v:"Verbal request — unverified",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"55 / 100 — MEDIUM",r:"m"},{i:"ti-phone",l:"Change method",v:"Phone call only",r:"h"},{i:"ti-building-bank",l:"Bank account",v:"Unchanged",r:"l"},{i:"ti-license",l:"W-9 status",v:"Current — verified",r:"l"}],rl:"m",
+hint:"Vendor master data changes submitted verbally by phone — without a written portal request, email, or signed documentation — are easily fabricated. This is a common first step in vendor fraud schemes.",
+advice:"Do not make any changes based on a phone call alone. Require the vendor to submit the address change through the self-service portal or in writing with a signature. Call back the vendor on their verified phone number to confirm the request is legitimate."},
+choices:["Update the address immediately — the caller sounded legitimate","Do nothing — verbal requests are fine for small changes","Require a written or portal request and call the vendor back on their verified number","Ask the caller to email the change and update it when received"],correct:2,
+explain:"Vendor master data changes must never be made based on a phone call alone. Always require written or portal submission and verify through a separate channel."},
+
+{category:"Invoice red flags",question:"An invoice arrives from Acme Supplies with a PO Box as the only remittance address, no physical address, and an invoice number that starts with 0001. What is the most appropriate AP response?",
+vendor:{name:"Acme Supplies Inc",type:"General supplies",avatar:"AS",ab:"#FCEBEB",ac:"#791F1F",
+stats:[{i:"ti-map-pin",l:"Remittance address",v:"PO Box 4492 only",r:"h"},{i:"ti-history",l:"Payment history",v:"None — first invoice",r:"h"},{i:"ti-file-invoice",l:"Invoice number",v:"0001 — sequential start",r:"m"},{i:"ti-shield",l:"OAN risk score",v:"81 / 100 — HIGH",r:"h"},{i:"ti-building-bank",l:"Bank account",v:"New ACH submitted",r:"h"},{i:"ti-license",l:"W-9 status",v:"Not received",r:"h"}],rl:"h",
+hint:"PO Box-only remittance with no physical address, a sequential invoice number starting at 0001, no W-9, and a new ACH account are all signs of a shell company or fictitious vendor.",
+advice:"Place this invoice on hold immediately. Request a physical business address, a signed W-9, and verification of the ACH account before any payment is considered. Run a vendor verification check through OAN."},
+choices:["Approve — PO Boxes are common for small businesses","Hold and request physical address, W-9, and ACH verification","Pay and flag for follow-up review later","Route to IT security only"],correct:1,
+explain:"PO Box-only addresses with no physical location, sequential invoice numbers, and missing W-9 are classic shell company indicators. Full verification is required before any payment."},
+
+{category:"Payment terms",question:"A vendor with net-30 payment terms submits an invoice and then calls 2 days later urgently requesting immediate payment, claiming their business will close without it. What should AP do?",
+vendor:{name:"Pinnacle Printing Co",type:"Commercial printing",avatar:"PP",ab:"#E3ECF3",ac:"#0F2A44",
+stats:[{i:"ti-history",l:"Payment history",v:"5 invoices — $28K paid",r:"l"},{i:"ti-clock",l:"Terms",v:"Net 30 — 2 days into cycle",r:"l"},{i:"ti-phone",l:"Urgency request",v:"Phone call — urgent payment",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"48 / 100 — MEDIUM",r:"m"},{i:"ti-building-bank",l:"Bank account",v:"Unchanged — verified",r:"l"},{i:"ti-currency-dollar",l:"Invoice amount",v:"$12,400",r:"l"}],rl:"m",
+hint:"Urgency and emotional pressure are social engineering tactics. Legitimate vendors do not typically demand immediate payment outside of agreed terms unless something has changed. The bank account is unchanged which reduces fraud risk.",
+advice:"Follow your payment terms policy. Explain to the vendor that payment will be processed per the agreed net-30 terms. Escalate to a supervisor if pressure continues. Do not expedite payment based on emotional appeals alone."},
+choices:["Pay immediately — the vendor relationship is more important than terms","Follow net-30 terms and escalate to a supervisor if pressure continues","Negotiate a partial early payment","Contact the vendor's bank to verify the urgency claim"],correct:1,
+explain:"Urgency pressure is a social engineering tactic. Follow your payment terms policy and escalate if the pressure continues. Bank account is unchanged, reducing fraud risk, but policy must be followed."},
+
+{category:"W-9 verification",question:"A vendor submits a W-9 with a name that does not match the company name on their invoices. The EIN is valid according to IRS records. What should AP do?",
+vendor:{name:"Summit Services LLC (W-9 shows: Summit Services Inc)",type:"IT services",avatar:"SS",ab:"#FAEEDA",ac:"#633806",
+stats:[{i:"ti-license",l:"W-9 name",v:"Summit Services Inc — mismatch",r:"h"},{i:"ti-file-invoice",l:"Invoice name",v:"Summit Services LLC",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"61 / 100 — MEDIUM",r:"m"},{i:"ti-history",l:"Payment history",v:"None — first invoice",r:"h"},{i:"ti-building-bank",l:"Bank account",v:"New ACH submitted",r:"h"},{i:"ti-check",l:"EIN validation",v:"Valid EIN confirmed",r:"l"}],rl:"m",
+hint:"A name mismatch between the W-9 and the invoice is a significant discrepancy. It could be a legitimate name variation (LLC vs Inc) or it could indicate the W-9 belongs to a different entity entirely.",
+advice:"Place the invoice on hold. Contact the vendor to explain the discrepancy and request a corrected W-9 or written explanation of the name difference. Do not process payment until the entity name is reconciled and confirmed."},
+choices:["Approve — the EIN is valid so the W-9 is fine","Pay — LLC vs Inc is just a minor formatting difference","Hold and request a corrected W-9 or written explanation of the name mismatch","Reject and remove the vendor immediately"],correct:2,
+explain:"A name mismatch on a W-9 must be resolved before payment. The vendor must submit a corrected W-9 or written explanation. A valid EIN alone does not resolve an entity name discrepancy."},
+
+{category:"Three-way match",question:"A purchase order was issued for 100 units at $50 each ($5,000). The goods receipt shows 80 units received. The vendor's invoice is for 100 units at $5,000. What is the correct AP action?",
+vendor:{name:"Allied Industrial Parts",type:"Industrial parts",avatar:"AI",ab:"#E1F5EE",ac:"#0F6E56",
+stats:[{i:"ti-file-invoice",l:"PO amount",v:"100 units @ $50 = $5,000",r:"l"},{i:"ti-package",l:"Goods received",v:"80 units only",r:"h"},{i:"ti-receipt",l:"Invoice amount",v:"$5,000 — 100 units",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"44 / 100 — MEDIUM",r:"m"},{i:"ti-history",l:"Payment history",v:"14 invoices — $82K paid",r:"l"},{i:"ti-building-bank",l:"Bank account",v:"Unchanged — verified",r:"l"}],rl:"m",
+hint:"The three-way match between PO, goods receipt, and invoice has failed. 80 units were received but 100 are being billed. This is either an overbilling error or a fraudulent invoice.",
+advice:"Place the invoice on hold. Contact the vendor and notify them that you have only received 80 units and will pay for 80 units ($4,000). Request a corrected invoice for the quantity received. Do not pay the full $5,000."},
+choices:["Pay $5,000 — the vendor is trusted with 14 invoices paid","Pay $4,000 — the amount for 80 units actually received","Hold the entire invoice until all 100 units arrive","Reject the invoice and cancel the purchase order"],correct:1,
+explain:"A three-way match failure means you only pay for what was actually received. The correct payment is $4,000 for 80 units. Request a corrected invoice from the vendor."},
+
+{category:"Invoice red flags",question:"An invoice arrives from a vendor whose name is almost identical to an approved vendor — 'Precision Tech Solutions' vs. your approved vendor 'Precision Technology Solutions'. What should AP do?",
+vendor:{name:"Precision Tech Solutions (NEW)",type:"IT services",avatar:"PT",ab:"#FCEBEB",ac:"#791F1F",
+stats:[{i:"ti-alert-triangle",l:"Name similarity",v:"Matches approved vendor",r:"h"},{i:"ti-history",l:"Payment history",v:"None — not in vendor master",r:"h"},{i:"ti-building-bank",l:"Bank account",v:"Different from approved vendor",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"89 / 100 — HIGH",r:"h"},{i:"ti-license",l:"W-9 status",v:"Not on file",r:"h"},{i:"ti-map-pin",l:"Address",v:"Different from approved vendor",r:"h"}],rl:"h",
+hint:"A vendor name nearly identical to an approved vendor with a different bank account and different address is a classic fictitious vendor scheme. OAN has flagged this at 89 out of 100.",
+advice:"Do not process this invoice. This is a high-risk fictitious vendor indicator. Report to your AP supervisor and your vendor management team immediately. Do not add this vendor to the master without full verification against the existing approved vendor."},
+choices:["Approve — looks similar enough to the approved vendor","Hold and escalate — this is a potential fictitious vendor scheme","Ask the requestor which vendor they intended","Update the bank account to match and pay"],correct:1,
+explain:"A nearly identical vendor name with different bank account and address is a textbook fictitious vendor scheme. Escalate immediately and do not process payment."},
+
+{category:"Payment methods",question:"A vendor calls to say they are switching from check payment to ACH and asks you to update their banking information over the phone, providing account and routing numbers verbally. What should AP do?",
+vendor:{name:"Westbrook Supply Co",type:"General supplies",avatar:"WS",ab:"#E3ECF3",ac:"#0F2A44",
+stats:[{i:"ti-history",l:"Payment history",v:"31 invoices — $214K paid",r:"l"},{i:"ti-building-bank",l:"Bank change request",v:"Verbal phone request",r:"h"},{i:"ti-phone",l:"Change method",v:"Phone call — no documentation",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"52 / 100 — MEDIUM",r:"m"},{i:"ti-check",l:"Portal update",v:"Not completed",r:"h"},{i:"ti-lock",l:"Verification",v:"Not completed",r:"h"}],rl:"m",
+hint:"Banking information updates received verbally by phone cannot be verified and are a primary vector for payment fraud. The long payment history does not protect against a fraudster impersonating the vendor.",
+advice:"Do not update the bank account based on a phone call. Require the vendor to submit the banking change through the self-service portal with supporting documentation. After submission, call the vendor back on their verified number to confirm."},
+choices:["Update the bank account — the vendor has 31 invoices and is trusted","Require portal submission and call back the vendor on their verified number to confirm","Ask the vendor to send the information by email and then update","Accept the information but delay the update until the next invoice"],correct:1,
+explain:"Banking information must never be updated based on a phone call alone. Always require portal submission and out-of-band verification through a known phone number."},
+
+{category:"Approval workflow",question:"An invoice for $48,000 comes through with approval from a single manager whose authorization limit is $25,000. The invoice was routed directly to payment without secondary approval. What should AP do?",
+vendor:{name:"Summit Consulting Group",type:"Management consulting",avatar:"SC",ab:"#FAEEDA",ac:"#633806",
+stats:[{i:"ti-history",l:"Payment history",v:"7 invoices — $180K paid",r:"l"},{i:"ti-thumb-up",l:"Approval",v:"Single approver — limit exceeded",r:"h"},{i:"ti-currency-dollar",l:"Invoice amount",v:"$48,000",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"67 / 100 — HIGH",r:"h"},{i:"ti-users",l:"Required approvers",v:"2 required over $25K",r:"h"},{i:"ti-building-bank",l:"Bank account",v:"Unchanged — verified",r:"l"}],rl:"h",
+hint:"The invoice amount exceeds the single approver's authorization limit. Two approvers are required for amounts over $25,000. Bypassing approval controls is a key internal control failure.",
+advice:"Do not process this payment. Return the invoice to the workflow and require a secondary approver at the appropriate authorization level before releasing payment. This is a segregation of duties requirement."},
+choices:["Pay — the manager approved it so it must be fine","Return the invoice to workflow and require secondary approval","Approve with a note that secondary approval is needed next time","Escalate to the CFO immediately"],correct:1,
+explain:"Authorization limits are internal controls that must be enforced. An invoice exceeding the approver's limit requires escalation to a second approver regardless of the vendor relationship."}
+],
+
+advanced:[
+{category:"Bank account change",question:"The OAN agent detected a bank account update submitted via email 2 days before a $112,000 payment is due. The request came via email from a slightly different sender domain than the vendor's verified email. What should AP do?",
+vendor:{name:"Stratford Industrial Supply",type:"Industrial equipment",avatar:"SI",ab:"#FAEEDA",ac:"#633806",
+stats:[{i:"ti-history",l:"Payment history",v:"18 invoices — $680K paid",r:"l"},{i:"ti-building-bank",l:"Bank change",v:"New account — 2 days ago",r:"h"},{i:"ti-mail",l:"Sender domain",v:"@stratford-supply.net (not .com)",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"91 / 100 — HIGH",r:"h"},{i:"ti-phone",l:"Call-back verified",v:"Not completed",r:"h"},{i:"ti-clock",l:"Payment due",v:"$112,000 in 2 days",r:"m"}],rl:"h",
+hint:"A slightly altered email domain is a classic BEC indicator — attackers register domains nearly identical to the real vendor's domain. Combined with timing right before a large payment, this is extremely high risk.",
+advice:"Place a payment hold immediately. Call the vendor on the phone number in your vendor master — not any number provided in the email. Verify whether the email domain change was authorized by the actual vendor."},
+choices:["Update the bank and pay — the domain difference is probably a typo","Call the number provided in the change request email","Place a hold and call the vendor's known verified number","Approve — 18 invoices means this is a trusted relationship"],correct:2,
+explain:"Domain spoofing combined with a bank change 48 hours before a large payment is a textbook BEC attack. Always call the vendor's verified number — never a number from the suspicious email."},
+
+{category:"Communication change",question:"The OAN agent detected the primary email contact for this vendor changed 3 days ago via an email request — not through the portal. A $41,200 invoice arrived from the new address 1 day later. No portal login has occurred from the new address.",
+vendor:{name:"Lakewood Print Solutions",type:"Commercial printing",avatar:"LP",ab:"#E3ECF3",ac:"#0F2A44",
+stats:[{i:"ti-history",l:"Payment history",v:"11 invoices — $137K paid",r:"l"},{i:"ti-mail",l:"Email change",v:"Via email — 3 days ago",r:"h"},{i:"ti-file-invoice",l:"Invoice timing",v:"Arrived 1 day after change",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"79 / 100 — HIGH",r:"h"},{i:"ti-lock",l:"Portal login",v:"No login from new address",r:"m"},{i:"ti-currency-dollar",l:"Invoice amount",v:"$41,200",r:"m"}],rl:"h",
+hint:"Email contact changed via email 3 days ago — not through the portal. Invoice arrived 24 hours later. No portal login from the new address. Legitimate vendors who update their email almost always also log into the portal.",
+advice:"Hold payment and call the vendor on a verified phone number in your vendor master. No portal login from the new contact is the critical signal — a BEC attacker would not have portal access."},
+choices:["Approve — contact updates happen and the invoice looks normal","Pay and note the new contact for records","Hold and verify the email change via phone to the vendor's known number","Send to IT security only — AP should not handle this"],correct:2,
+explain:"Email contact change followed within 24 hours by a large invoice with no portal login is textbook BEC. AP should hold and call the vendor on a verified number."},
+
+{category:"Dormant vendor reactivation",question:"This vendor has been inactive for 22 months. They reactivated 5 days ago with updated banking details and submitted a $55,000 invoice — 4x their historical average of $12,400. Their W-9 expired in 2021.",
+vendor:{name:"Central Valley Logistics",type:"Freight & warehousing",avatar:"CV",ab:"#FCEBEB",ac:"#791F1F",
+stats:[{i:"ti-history",l:"Last payment",v:"22 months ago — $12,400",r:"m"},{i:"ti-building-bank",l:"Bank account",v:"New routing — updated",r:"h"},{i:"ti-file-invoice",l:"Invoice amount",v:"$55,000 — 4x prior avg",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"85 / 100 — HIGH",r:"h"},{i:"ti-calendar",l:"Reactivated",v:"Via portal — 5 days ago",r:"m"},{i:"ti-license",l:"W-9 on file",v:"Expired — 2021",r:"h"}],rl:"h",
+hint:"Four simultaneous risk signals: 22-month dormancy, new bank routing, invoice 4x above historical average, and an expired W-9. Dormant vendor reactivations with bank changes are a known fraud vector.",
+advice:"Hold the payment. Require a fresh W-9, re-verify the bank account by phone, and escalate for secondary approval before releasing anything. Do not let the prior relationship make you skip these verification steps."},
+choices:["Approve — they reactivated through the portal so it must be legitimate","Pay — the prior relationship makes this low risk","Hold, require fresh W-9, re-verify bank, and get secondary approval","Pay 25% as a good-faith partial payment"],correct:2,
+explain:"Dormant reactivation with a new bank account and 4x invoice amount is a high-risk trifecta. Expired W-9 is an additional hard stop."},
+
+{category:"Payment anomaly",question:"The OAN agent flagged an invoice from a trusted vendor that is 340% above their 12-month rolling average. No purchase order exists for this amount. The invoice is submitted at end of quarter.",
+vendor:{name:"Summit Facilities Management",type:"Facilities & maintenance",avatar:"SF",ab:"#E3ECF3",ac:"#0F2A44",
+stats:[{i:"ti-history",l:"Payment history",v:"47 invoices — $892K paid",r:"l"},{i:"ti-chart-bar",l:"Invoice amount",v:"$84,000 — 340% above avg",r:"h"},{i:"ti-file-invoice",l:"PO match",v:"No PO on file",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"68 / 100 — MEDIUM",r:"m"},{i:"ti-calendar",l:"Timing",v:"End of quarter submission",r:"m"},{i:"ti-building-bank",l:"Bank account",v:"Unchanged — verified",r:"l"}],rl:"m",
+hint:"340% above rolling average with no PO at end of quarter is statistically anomalous. End-of-quarter timing increases the risk this invoice is being used to manipulate period financials. Bank account is clean.",
+advice:"Hold and require a PO or budget owner sign-off before processing. The bank account being unchanged and clean is reassuring, but the amount deviation and missing PO are hard controls that must be satisfied."},
+choices:["Approve — this is a trusted vendor with 47 paid invoices","Pay immediately — end of quarter timing justifies urgency","Hold and require a PO or budget owner approval","Reject the invoice and block the vendor"],correct:2,
+explain:"Even trusted vendors warrant scrutiny on anomalous amounts. A 340% spike with no PO requires a PO or budget approval hold — not outright rejection, but not unconditional approval either."},
+
+{category:"Early payment discount fraud",question:"A vendor offers a 5% early payment discount if paid within 3 days instead of the standard net-60 terms. The discount seems unusually high. The vendor says they need cash urgently. What should AP do?",
+vendor:{name:"Pacific Rim Distributors",type:"Distribution",avatar:"PR",ab:"#FAEEDA",ac:"#633806",
+stats:[{i:"ti-history",l:"Payment history",v:"9 invoices — $124K paid",r:"l"},{i:"ti-currency-dollar",l:"Invoice amount",v:"$67,800",r:"m"},{i:"ti-discount",l:"Discount offered",v:"5% if paid in 3 days",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"58 / 100 — MEDIUM",r:"m"},{i:"ti-building-bank",l:"Bank account",v:"Unchanged — verified",r:"l"},{i:"ti-clock",l:"Standard terms",v:"Net 60",r:"l"}],rl:"m",
+hint:"A 5% early payment discount far exceeds normal early payment terms (standard is 1-2%). Unusually high discounts combined with urgency claims can be a social engineering technique to accelerate payment before fraud is detected.",
+advice:"Verify the discount offer by calling the vendor on their verified number. Confirm the offer is documented in writing. Review whether your organization's financial policy permits accepting non-standard early payment terms. Escalate to a supervisor before accepting."},
+choices:["Take the discount immediately — 5% is great savings","Ignore the offer and pay at net-60 as originally agreed","Verify the offer by phone, get written confirmation, and escalate per policy","Pay early but only apply a 2% discount since 5% seems too high"],correct:2,
+explain:"Unusually high discounts with urgency pressure are social engineering tactics. Verify verbally, get written confirmation, and escalate per your organization's payment policy."},
+
+{category:"Internal fraud indicators",question:"An AP analyst submits invoices from a vendor whose remittance address matches the analyst's personal home address ZIP code. The analyst has sole approval authority for invoices under $10,000. What should a supervisor do?",
+vendor:{name:"Apex General Services",type:"General services",avatar:"AG",ab:"#FCEBEB",ac:"#791F1F",
+stats:[{i:"ti-map-pin",l:"Remittance address",v:"Matches employee home ZIP",r:"h"},{i:"ti-users",l:"Submitted by",v:"Same analyst — sole approver",r:"h"},{i:"ti-currency-dollar",l:"Invoice amounts",v:"$8,500 — $9,800 — $9,600",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"93 / 100 — HIGH",r:"h"},{i:"ti-history",l:"Vendor age",v:"Added 4 months ago",r:"m"},{i:"ti-file-invoice",l:"Pattern",v:"Multiple invoices just under $10K",r:"h"}],rl:"h",
+hint:"Remittance address matching an employee's home ZIP, self-approval of invoices, and a pattern of amounts just below the authorization threshold are classic internal fraud indicators — specifically a fictitious vendor scheme with threshold splitting.",
+advice:"Immediately escalate to internal audit and your compliance team. Freeze all pending payments to this vendor. Do not tip off the employee. This pattern — same-ZIP remittance, self-approval, and consistent below-threshold splitting — is a textbook employee embezzlement scheme."},
+choices:["Approve the invoices — the analyst has authority for amounts under $10K","Freeze payments and escalate to internal audit and compliance immediately","Ask the analyst to recuse themselves from future approvals for this vendor","Require dual approval going forward but process pending invoices"],correct:1,
+explain:"Remittance address matching an employee's home ZIP combined with self-approval and threshold splitting is a textbook employee fraud scheme. Escalate to internal audit immediately and freeze payments."},
+
+{category:"Vendor consolidation fraud",question:"During a vendor master cleanup, the OAN agent identifies two vendor records with different names but identical bank routing and account numbers. Both vendors have been receiving payments for similar services. What is this?",
+vendor:{name:"Meridian Tech Services / Meridian Technology Group",type:"IT services",avatar:"MT",ab:"#FCEBEB",ac:"#791F1F",
+stats:[{i:"ti-building-bank",l:"Bank account",v:"IDENTICAL routing & account",r:"h"},{i:"ti-copy",l:"Duplicate bank",v:"Same account — 2 vendors",r:"h"},{i:"ti-currency-dollar",l:"Combined payments",v:"$340K over 18 months",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"96 / 100 — HIGH",r:"h"},{i:"ti-users",l:"Approved by",v:"Same manager — both vendors",r:"h"},{i:"ti-history",l:"Services overlap",v:"Both billed for IT support",r:"h"}],rl:"h",
+hint:"Two different vendor names with identical bank accounts is the clearest indicator of a duplicate or fictitious vendor scheme. Combined with the same approving manager and overlapping services, this is a high-confidence fraud finding.",
+advice:"Halt all payments to both vendors immediately. Escalate to internal audit, legal, and your CISO. Preserve all payment records and email communications. This is a potential internal fraud scheme — the approving manager should be placed on administrative leave pending investigation."},
+choices:["Merge the two records into one vendor and continue payments","Investigate further before stopping payments to avoid disrupting operations","Halt all payments to both vendors and escalate to internal audit and legal immediately","Remove the duplicate record and continue paying the primary vendor"],correct:2,
+explain:"Two vendor records with identical bank accounts combined with the same approving manager and overlapping services is a high-confidence internal fraud finding. Halt payments and escalate immediately."},
+
+{category:"Invoice timing patterns",question:"The OAN agent identifies that a vendor submits invoices exclusively on the last business day of each month, always for amounts between $9,500 and $9,900. The authorization threshold is $10,000. What does this pattern indicate?",
+vendor:{name:"Clearwater Consulting LLC",type:"Consulting",avatar:"CC",ab:"#FCEBEB",ac:"#791F1F",
+stats:[{i:"ti-calendar",l:"Invoice timing",v:"Last day of month — every month",r:"h"},{i:"ti-currency-dollar",l:"Invoice amounts",v:"$9,500–$9,900 consistently",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"88 / 100 — HIGH",r:"h"},{i:"ti-users",l:"Approver",v:"Same person — all 12 months",r:"h"},{i:"ti-file-invoice",l:"Services documented",v:"Vague descriptions only",r:"h"},{i:"ti-history",l:"Pattern duration",v:"12 consecutive months",r:"m"}],rl:"h",
+hint:"Invoices consistently just below an authorization threshold, submitted on the last business day of the month for 12 straight months with vague descriptions and the same approver, is threshold splitting — a deliberate technique to avoid oversight controls.",
+advice:"Escalate this pattern to internal audit immediately. Threshold splitting is a deliberate fraud technique designed to stay below approval limits. Request detailed documentation for all 12 invoices. Do not process any further payments until a full audit is complete."},
+choices:["Continue approving — the amounts are under threshold so controls are satisfied","Request documentation for one recent invoice and approve the others","Escalate to internal audit — this is a threshold-splitting pattern","Ask the vendor to combine invoices into larger quarterly amounts"],correct:2,
+explain:"Consistent amounts just below authorization thresholds with vague descriptions and a single approver for 12 consecutive months is threshold splitting — a deliberate fraud technique. Escalate to internal audit immediately."},
+
+{category:"Remittance fraud",question:"A vendor emails requesting that future payments be remitted to a new bank account because they have switched banking partners. The email looks authentic but came outside of normal business hours. The vendor has a large payment due next week. What should AP do?",
+vendor:{name:"Norwood Legal Services",type:"Legal services",avatar:"NL",ab:"#FAEEDA",ac:"#633806",
+stats:[{i:"ti-history",l:"Payment history",v:"15 invoices — $420K paid",r:"l"},{i:"ti-building-bank",l:"Bank change request",v:"Email — outside business hours",r:"h"},{i:"ti-clock",l:"Timing",v:"Large payment due next week",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"74 / 100 — HIGH",r:"h"},{i:"ti-mail",l:"Email appearance",v:"Appears authentic",r:"m"},{i:"ti-phone",l:"Call-back verified",v:"Not completed",r:"h"}],rl:"h",
+hint:"Bank account change requests arriving via email outside business hours, timed before a large payment, are a classic BEC pattern. Even an email that looks authentic may be compromised — email spoofing is trivial for attackers.",
+advice:"Do not update the bank account based on the email. Call the vendor on their verified phone number during business hours to confirm the request is legitimate. Do not rush — the payment deadline does not override your verification requirement."},
+choices:["Update the bank account — the email looks authentic and the vendor is trusted","Process the payment to the new account since it may delay the vendor relationship","Call the vendor on their verified phone number to confirm before making any changes","Wait for the vendor to call you before updating"],correct:2,
+explain:"Email authentication is not sufficient for bank account changes. Always call the vendor on their verified number regardless of how authentic the email appears. Timing before a large payment is a major red flag."},
+
+{category:"Procurement fraud",question:"A procurement manager submits a single-source justification to bypass competitive bidding for a $250,000 contract, citing urgency. The OAN agent shows the awarded vendor was registered only 6 weeks ago. What should AP do?",
+vendor:{name:"Rapid Solutions Group",type:"Professional services",avatar:"RS",ab:"#FCEBEB",ac:"#791F1F",
+stats:[{i:"ti-history",l:"Vendor age",v:"Registered 6 weeks ago",r:"h"},{i:"ti-currency-dollar",l:"Contract value",v:"$250,000",r:"h"},{i:"ti-file-invoice",l:"Bid process",v:"Single-source — no competition",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"86 / 100 — HIGH",r:"h"},{i:"ti-users",l:"Awarded by",v:"Single procurement manager",r:"h"},{i:"ti-building-bank",l:"Bank account",v:"New ACH — unverified",r:"h"}],rl:"h",
+hint:"A single-source justification for a $250,000 contract awarded to a vendor registered 6 weeks ago by a single procurement manager is a high-risk procurement fraud pattern. The combination of lack of competition, new vendor, and large contract is a textbook kickback setup.",
+advice:"Do not process any payment. Escalate to your procurement compliance team and internal audit. Request independent review of the single-source justification. A 6-week-old vendor receiving a $250K no-bid contract is an extreme red flag."},
+choices:["Process payment — the procurement manager authorized the single-source justification","Approve once the bank account is verified","Escalate to procurement compliance and internal audit — do not process payment","Process 50% now and hold the remainder pending documentation"],correct:2,
+explain:"A single-source justification awarding a $250K contract to a 6-week-old vendor by a single manager is a high-risk kickback indicator. Escalate to compliance and internal audit before any payment."}
+],
+
+expert:[
+{category:"AI-generated invoice fraud",question:"The OAN agent flags an invoice that passed OCR processing cleanly but the metadata analysis shows the PDF was created 3 hours before the invoice date, the font is inconsistent with the vendor's historical invoices, and the total does not match the line item sum by $0.03. What is the risk?",
+vendor:{name:"Horton Automotive",type:"Automotive parts",avatar:"HA",ab:"#FCEBEB",ac:"#791F1F",
+stats:[{i:"ti-file",l:"PDF metadata",v:"Created 3hrs before invoice date",r:"h"},{i:"ti-typography",l:"Font analysis",v:"Different from historical invoices",r:"h"},{i:"ti-calculator",l:"Math check",v:"Total off by $0.03",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"94 / 100 — HIGH",r:"h"},{i:"ti-history",l:"Payment history",v:"12 invoices — $204K paid",r:"l"},{i:"ti-building-bank",l:"Bank account",v:"Unchanged — verified",r:"l"}],rl:"h",
+hint:"PDF metadata showing creation before the invoice date, inconsistent fonts, and a rounding error in the total are hallmarks of an AI-generated or digitally manipulated invoice. These details escape human review but are detectable by OAN's document intelligence layer.",
+advice:"Do not process this payment. Contact the vendor directly by phone to request the original invoice resent from their billing system. Compare against historical invoice formatting. This is a potential invoice manipulation or AI-generated fraud attempt."},
+choices:["Approve — the math difference is only $0.03 and the vendor is trusted","Pay and correct the $0.03 discrepancy manually","Hold — contact vendor by phone to request a re-issued invoice and compare metadata","Reject the invoice and block the vendor permanently"],correct:2,
+explain:"AI-generated and manipulated invoices often contain subtle metadata anomalies invisible to humans. PDF creation date before the invoice date, font changes, and calculation errors are OAN's document intelligence signals. Always request a re-issued original."},
+
+{category:"Shell company network",question:"The OAN agent identifies that three separate vendors — all added in the same 2-week window — share the same registered agent, are all approved by the same internal manager, have different EINs but the same physical address, and have all submitted invoices for 'consulting services' with no deliverables documented. What is this?",
+vendor:{name:"Apex Group / Blue Ridge Partners / Summit Advisory",type:"Consulting",avatar:"MV",ab:"#FCEBEB",ac:"#791F1F",
+stats:[{i:"ti-building",l:"Physical address",v:"Identical — all 3 vendors",r:"h"},{i:"ti-users",l:"Registered agent",v:"Same agent — all 3 vendors",r:"h"},{i:"ti-calendar",l:"Onboarded",v:"Same 2-week window",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"97 / 100 — CRITICAL",r:"h"},{i:"ti-file-invoice",l:"Services billed",v:"Vague 'consulting' — no deliverables",r:"h"},{i:"ti-users",l:"Internal approver",v:"Same manager — all 3 vendors",r:"h"}],rl:"h",
+hint:"Three vendors with the same physical address, same registered agent, same approving manager, vague service descriptions, and onboarded in the same 2-week window is a shell company network. This is a sophisticated internal fraud scheme using multiple entities to spread payments below detection thresholds.",
+advice:"Stop all payments to all three vendors immediately. Escalate to your Chief Compliance Officer, internal audit, legal, and your external auditors. Preserve all records. The approving manager should be placed on administrative leave pending investigation. This may require law enforcement notification."},
+choices:["Investigate each vendor separately before taking any action","Continue payments until the investigation is complete to avoid disrupting operations","Stop all payments immediately and escalate to CCO, internal audit, and legal","Require deliverable documentation from each vendor before the next payment"],correct:2,
+explain:"A shell company network — identical address, shared registered agent, same approver, vague services — is a sophisticated organized fraud scheme. Escalate to CCO, internal audit, and legal immediately. This likely requires law enforcement involvement."},
+
+{category:"Supply chain invoice injection",question:"Your e-procurement system receives an XML invoice file from a supplier's EDI connection. The OAN agent detects the file contains a script tag in the description field. The invoice amount and vendor details appear correct. What is happening?",
+vendor:{name:"GlobalTech Distribution",type:"Technology distribution",avatar:"GT",ab:"#FCEBEB",ac:"#791F1F",
+stats:[{i:"ti-code",l:"Invoice file",v:"XML with embedded script tag",r:"h"},{i:"ti-history",l:"Payment history",v:"28 invoices — $1.2M paid",r:"l"},{i:"ti-shield",l:"OAN risk score",v:"91 / 100 — HIGH",r:"h"},{i:"ti-server",l:"Delivery method",v:"EDI — automated processing",r:"h"},{i:"ti-alert-triangle",l:"Script tag location",v:"Description field — embedded",r:"h"},{i:"ti-building-bank",l:"Bank account",v:"Unchanged at submission",r:"l"}],rl:"h",
+hint:"An embedded script tag in an XML invoice file processed through an automated EDI channel is a code injection attack. If executed by the AP system, it could redirect payments, exfiltrate data, or alter bank account details programmatically without human review.",
+advice:"Reject and quarantine this invoice file immediately. Alert your IT security team and CISO. Do not process any invoices from this EDI connection until the supply chain connection is audited. Notify the vendor by verified phone that their EDI connection may have been compromised."},
+choices:["Process the invoice — the amounts and vendor details look correct","Approve the invoice but remove the description field before processing","Quarantine the file, alert IT security and CISO, and suspend the EDI connection","Manually re-enter the invoice data to bypass the script and process payment"],correct:2,
+explain:"An embedded script tag in an EDI invoice file is a code injection attack that can redirect payments or exfiltrate data. Quarantine immediately, alert IT security, and suspend the EDI connection. Never process."},
+
+{category:"Collusion and segregation of duties",question:"An audit reveals that one employee both adds new vendors to the master file AND has full payment authority. Over 18 months, they have added 7 vendors and approved $1.8M in payments to those vendors. What are the correct immediate actions?",
+vendor:{name:"Multiple vendors added by same employee",type:"Various",avatar:"!",ab:"#FCEBEB",ac:"#791F1F",
+stats:[{i:"ti-users",l:"Control failure",v:"Same person — add & pay",r:"h"},{i:"ti-currency-dollar",l:"Total payments",v:"$1.8M — 7 vendors",r:"h"},{i:"ti-calendar",l:"Time period",v:"18 months — undetected",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"99 / 100 — CRITICAL",r:"h"},{i:"ti-lock",l:"Segregation of duties",v:"Completely absent",r:"h"},{i:"ti-file-invoice",l:"Vendor types",v:"Multiple — services & supplies",r:"h"}],rl:"h",
+hint:"Segregation of duties is the foundational control that prevents one person from both creating and paying vendors. When this fails, the risk of undetected embezzlement is extremely high. $1.8M over 18 months with no oversight is a critical finding.",
+advice:"Immediately: (1) Revoke the employee's access to both functions. (2) Freeze all payments to the 7 vendors. (3) Notify internal audit, legal, and executive leadership. (4) Engage external forensic accountants. (5) Notify law enforcement. (6) Review all 18 months of transactions. (7) Preserve all electronic records under legal hold."},
+choices:["Implement segregation of duties going forward but do not disturb existing payments","Audit only the most recent 6 months of transactions for efficiency","Revoke access, freeze payments, notify leadership and legal, engage forensic accountants, notify law enforcement","Terminate the employee and resume normal operations after access is removed"],correct:2,
+explain:"A complete segregation of duties failure enabling $1.8M in payments over 18 months requires immediate comprehensive response: access revocation, payment freeze, internal audit, forensic accountants, and law enforcement notification."},
+
+{category:"Synthetic identity fraud",question:"A vendor passes all standard verification checks — valid EIN, verified address, matching W-9, portal registration. However, the OAN agent's behavioral analysis shows invoice patterns that statistically match no legitimate business activity: perfectly round amounts, invoices submitted at 3AM, and zero customer service contacts ever made. What does this indicate?",
+vendor:{name:"Northgate Solutions Corp",type:"Professional services",avatar:"NS",ab:"#FCEBEB",ac:"#791F1F",
+stats:[{i:"ti-check",l:"EIN",v:"Valid — IRS confirmed",r:"l"},{i:"ti-clock",l:"Submission time",v:"All invoices at 3:00 AM",r:"h"},{i:"ti-currency-dollar",l:"Invoice amounts",v:"Always exactly round numbers",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"88 / 100 — HIGH",r:"h"},{i:"ti-phone",l:"Vendor contact",v:"Zero inbound contacts in 2 years",r:"h"},{i:"ti-activity",l:"Behavioral pattern",v:"Statistically non-human",r:"h"}],rl:"h",
+hint:"A vendor that passes all documentary checks but exhibits non-human behavioral patterns — 3AM submissions, perfectly round amounts, and zero human contact in 2 years — may be a synthetic identity or a fully automated fraud entity. OAN's behavioral AI detects patterns no human reviewer would notice.",
+advice:"Hold all pending payments. Request a video call or in-person meeting with the vendor's representative. Attempt to contact the vendor by phone at their registered number. If no human contact can be established, escalate to internal audit. A legitimate vendor will welcome the call."},
+choices:["Continue payments — all documentary checks passed so the vendor is legitimate","Approve but flag for annual review","Hold payments and attempt direct human contact via video call or phone — escalate if no response","Reject the vendor — behavioral flags override documentary verification"],correct:2,
+explain:"Synthetic identity fraud passes all documentary checks but exhibits non-human behavioral signatures. OAN's behavioral analysis detects these patterns. Always verify human existence with direct contact before concluding the investigation."},
+
+{category:"Payment redirect via invoice portal",question:"Your vendor self-service portal shows that an established vendor logged in from an unrecognized IP address in a foreign country, changed their bank account, and immediately submitted an invoice for $89,000. The login used valid credentials. What should AP do?",
+vendor:{name:"Metro IT Solutions Inc",type:"IT managed services",avatar:"MI",ab:"#FCEBEB",ac:"#791F1F",
+stats:[{i:"ti-world",l:"Login location",v:"Foreign country — unrecognized IP",r:"h"},{i:"ti-building-bank",l:"Bank change",v:"Changed during same session",r:"h"},{i:"ti-file-invoice",l:"Invoice submitted",v:"$89,000 — same session",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"95 / 100 — CRITICAL",r:"h"},{i:"ti-lock",l:"Credential status",v:"Valid — may be compromised",r:"h"},{i:"ti-history",l:"Payment history",v:"24 invoices — $618K paid",r:"l"}],rl:"h",
+hint:"Valid credentials from a foreign IP, bank account change, and immediate large invoice submission in a single session is the signature of a vendor portal account takeover. The attacker obtained the vendor's login credentials and is executing a payment redirect in real time.",
+advice:"Immediately: (1) Suspend the vendor's portal access. (2) Place an emergency hold on the $89,000 invoice. (3) Call the vendor on their verified phone number to report the suspected account compromise. (4) Alert your IT security team. (5) Reset the vendor's portal credentials after identity verification. This is an active attack."},
+choices:["Approve — valid credentials were used so it must be the actual vendor","Contact the vendor by email to verify the bank change before processing","Suspend portal access, hold the invoice, call the vendor on verified number, and alert IT security immediately","Require the vendor to re-log in and confirm the changes"],correct:2,
+explain:"Valid credentials from a foreign IP with immediate bank change and large invoice submission is a vendor portal account takeover in progress. This is an active attack — suspend access, hold payment, and call the vendor immediately."},
+
+{category:"Split-payment fraud scheme",question:"The OAN agent detects that over the past 60 days, a single vendor has received 47 separate payments averaging $4,200 each — totaling $197,400. Your organization's policy requires dual approval for payments over $5,000. Each individual payment was single-approved. What is this pattern?",
+vendor:{name:"Apex General Contractors",type:"Construction & maintenance",avatar:"AG",ab:"#FCEBEB",ac:"#791F1F",
+stats:[{i:"ti-copy",l:"Payment pattern",v:"47 payments — avg $4,200",r:"h"},{i:"ti-currency-dollar",l:"Total paid",v:"$197,400 in 60 days",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"92 / 100 — HIGH",r:"h"},{i:"ti-users",l:"Approval",v:"Single approver — all 47",r:"h"},{i:"ti-file-invoice",l:"Invoice descriptions",v:"Similar vague descriptions",r:"h"},{i:"ti-clock",l:"Period",v:"60 days — accelerating",r:"h"}],rl:"h",
+hint:"47 payments averaging $4,200 — consistently below the $5,000 dual-approval threshold — over 60 days is a sophisticated split-payment scheme designed to circumvent authorization controls. The $197,400 total would have required 40 dual approvals if submitted at their true value.",
+advice:"Freeze all payments to this vendor immediately. Escalate to internal audit and your CISO. Review all 47 transactions for documentation. Determine whether the single approver and the vendor have any undisclosed relationship. This is a deliberate control circumvention scheme."},
+choices:["Continue — each individual payment was properly single-approved per policy","Require dual approval going forward but do not disturb past payments","Freeze all payments and escalate to internal audit immediately — this is a split-payment scheme","Review only the 5 most recent payments as a spot check"],correct:2,
+explain:"47 payments just below the dual-approval threshold with vague descriptions over 60 days is a deliberate split-payment scheme to circumvent controls. Freeze all payments and escalate to internal audit immediately."},
+
+{category:"Invoice factoring fraud",question:"A factoring company contacts your AP department claiming that Vendor X has assigned their receivables to the factoring company and all future payments should be redirected to the factoring company's bank account. They provide a seemingly legitimate assignment agreement. What is the highest-risk element of this situation?",
+vendor:{name:"Vendor X / Rapid Capital Factoring",type:"Various / Financial services",avatar:"FC",ab:"#FAEEDA",ac:"#633806",
+stats:[{i:"ti-history",l:"Vendor X history",v:"16 invoices — $280K paid",r:"l"},{i:"ti-building-bank",l:"Payment redirect",v:"To factoring company account",r:"h"},{i:"ti-file",l:"Assignment agreement",v:"Provided — not independently verified",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"78 / 100 — HIGH",r:"h"},{i:"ti-phone",l:"Vendor X contacted",v:"Not yet confirmed",r:"h"},{i:"ti-building",l:"Factoring company",v:"Not in vendor master",r:"h"}],rl:"h",
+hint:"Invoice factoring is legitimate but factoring fraud is common — attackers intercept or forge assignment agreements to redirect payments. The critical risk is that the assignment agreement may be forged, and Vendor X may not have authorized this factoring arrangement.",
+advice:"Do not redirect any payments until you have spoken directly with Vendor X's CFO or controller by phone at their verified number to confirm the factoring arrangement is authorized. Verify the factoring company's legitimacy independently. Never redirect payments based solely on documentation provided by the redirecting party."},
+choices:["Redirect payments — the assignment agreement looks legitimate","Add the factoring company as a new vendor and redirect immediately","Contact Vendor X directly on their verified number to confirm authorization before any redirect","Pay Vendor X and the factoring company separately to avoid disruption"],correct:2,
+explain:"Factoring fraud involves forged assignment agreements to redirect payments. Always verify directly with the original vendor's financial officer on a verified number before redirecting any payment to a third party."},
+
+{category:"Insider threat — procurement collusion",question:"OAN detects that a procurement officer consistently awards sole-source contracts to Vendor Y. The vendor's principal officer's name appears as an emergency contact in the procurement officer's HR file. Payments to Vendor Y have increased 600% over 2 years. What is this?",
+vendor:{name:"Vendor Y — Blue Horizon Services",type:"Professional services",avatar:"BH",ab:"#FCEBEB",ac:"#791F1F",
+stats:[{i:"ti-users",l:"Relationship",v:"Vendor principal = employee contact",r:"h"},{i:"ti-chart-bar",l:"Payment growth",v:"600% increase over 2 years",r:"h"},{i:"ti-file-invoice",l:"Contract method",v:"Sole-source — all awards",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"98 / 100 — CRITICAL",r:"h"},{i:"ti-building-bank",l:"Bank account",v:"Unchanged",r:"l"},{i:"ti-currency-dollar",l:"Total paid",v:"$2.1M over 2 years",r:"h"}],rl:"h",
+hint:"An undisclosed personal relationship between a procurement officer and a vendor's principal, combined with consistent sole-source awards and 600% payment growth, is a textbook kickback and procurement collusion scheme. This likely violates conflict of interest policies and potentially criminal anti-corruption laws.",
+advice:"Immediately escalate to your Chief Legal Officer, Chief Compliance Officer, and Board Audit Committee. Engage outside legal counsel and a forensic accounting firm. Place the procurement officer on administrative leave. Do not alert either party — preserve the investigation. This may involve law enforcement and regulatory reporting."},
+choices:["Require the procurement officer to recuse from future Vendor Y decisions","Implement competitive bidding going forward but allow existing contracts to run","Escalate to CLO, CCO, and Board Audit Committee — engage outside legal counsel and forensic accountants","Review only the most recent 6 months and implement a conflict of interest policy"],correct:2,
+explain:"An undisclosed personal relationship between a procurement officer and vendor principal with sole-source awards and 600% payment growth is procurement collusion and potential criminal fraud. Escalate to CLO, CCO, Board Audit Committee, and outside legal counsel immediately."},
+
+{category:"Deepfake and social engineering",question:"Your CFO's EA receives a video call from someone appearing to be the CFO instructing her to immediately wire $480,000 to a new international account for a 'confidential acquisition'. The caller is convincing but the request bypasses all normal AP workflow. What should the EA do?",
+vendor:{name:"International transfer — no vendor",type:"Wire transfer",avatar:"!",ab:"#FCEBEB",ac:"#791F1F",
+stats:[{i:"ti-video",l:"Communication",v:"Video call — CFO appearance",r:"h"},{i:"ti-currency-dollar",l:"Amount",v:"$480,000 wire transfer",r:"h"},{i:"ti-alert-triangle",l:"Workflow",v:"Bypasses all AP controls",r:"h"},{i:"ti-shield",l:"OAN risk score",v:"99 / 100 — CRITICAL",r:"h"},{i:"ti-clock",l:"Urgency",v:"Immediate — 'confidential'",r:"h"},{i:"ti-building-bank",l:"Destination",v:"New international account",r:"h"}],rl:"h",
+hint:"Deepfake video technology can convincingly impersonate executives. A video call from your CFO instructing you to bypass all controls and wire money immediately to an international account for a 'confidential' deal is the clearest possible indicator of a deepfake CEO fraud attack. No legitimate acquisition instruction bypasses all AP controls.",
+advice:"Do not make any wire transfer under any circumstances without completing all standard AP controls. Hang up and call the CFO directly on their personal mobile number. Walk to their office if they are in the building. Alert your IT security and CISO. Report to your CEO and Board. Legitimate executives never instruct staff to bypass all financial controls — this is always fraud."},
+choices:["Process the wire — the CFO clearly authorized it on video","Request an email confirmation from the CFO before wiring","Do not wire — end the call and contact the CFO directly on their personal mobile, then alert IT security","Reduce the wire to $100,000 and request confirmation before sending the remainder"],correct:2,
+explain:"Deepfake CEO fraud is one of the fastest-growing financial crime categories. No legitimate executive instructs staff to bypass all controls. Never make a large wire transfer based on any single communication channel — always verify through a completely separate channel."}
+],
+
+supplier:[
+{category:"Bank account validation — Pass",question:"An AP team member runs OAN's Global Supplier Risk Agent to validate a supplier's bank account. The agent checks routing 122105278 and account 0000000016 at Wells Fargo Bank NA (Arizona) and returns a PASS result. What does this mean and what should AP do next?",
+vendor:{name:"Wells Fargo Bank NA (Arizona)",type:"Bank account validation",avatar:"WF",ab:"#E1F5EE",ac:"#0F6E56",
+stats:[{i:"ti-building-bank",l:"Routing",v:"122105278 — Wells Fargo AZ",r:"l"},{i:"ti-check",l:"Account status",v:"Open and valid — PASS",r:"l"},{i:"ti-calendar",l:"Account history",v:"On file > 3 years",r:"l"},{i:"ti-shield",l:"OAN risk signal",v:"Account verified",r:"l"},{i:"ti-alert-triangle",l:"Phone data",v:"Mismatch flagged — risk note",r:"m"},{i:"ti-info-circle",l:"Identity check",v:"Not included in this call",r:"m"}],rl:"l",
+hint:"A PASS means the account is open and valid at Wells Fargo AZ, and has been on file for more than 3 years. However, the agent also detected a phone-data mismatch — an 'accept with risk' identity note. The bank account is fine, but the identity side needs attention.",
+advice:"For low-risk transactions, you can proceed but document the phone mismatch exception. For high-value or onboarding actions, perform phone verification or run gAuthenticate to resolve the mismatch before proceeding. Never treat a bank PASS as full identity confirmation."},
+choices:["Proceed immediately — a PASS means full verification is complete","Proceed for low-risk payments but resolve the phone mismatch before high-value actions","Reject the account — any identity note means it must be declined","Escalate to compliance before any payment"],correct:1,
+explain:"OAN's bank validation PASS confirms the account is open and valid. The phone-data mismatch is a separate identity signal that warrants additional verification for high-risk actions, but does not block low-risk payments."},
+
+{category:"Bank account validation — Decline",question:"The OAN Global Supplier Risk Agent validates routing 122105278 / account 0000000011 at Wells Fargo and returns a DECLINE (RT01 — account should be declined based on the risk factor reported). The account was added, updated, and closed more than 3 years ago. What is the correct AP action?",
+vendor:{name:"Wells Fargo Bank NA (Arizona)",type:"Bank account validation",avatar:"WF",ab:"#FCEBEB",ac:"#791F1F",
+stats:[{i:"ti-building-bank",l:"Routing",v:"122105278 — Wells Fargo AZ",r:"l"},{i:"ti-x",l:"Account status",v:"DECLINE — RT01 risk factor",r:"h"},{i:"ti-calendar",l:"Account history",v:"Closed > 3 years ago",r:"h"},{i:"ti-shield",l:"OAN risk signal",v:"Do not process",r:"h"},{i:"ti-credit-card",l:"FCRA",v:"Applies if adverse action taken",r:"m"},{i:"ti-file-invoice",l:"Next step",v:"Request alternate account",r:"h"}],rl:"h",
+hint:"RT01 means the account should be declined based on a reported risk factor. Combined with the account being closed for more than 3 years, this is a clear signal not to process. The agent specifically advises escalating to fraud or risk operations.",
+advice:"Do not process any payment or complete onboarding against this account. Escalate to fraud or risk operations for review. Request supporting documentation from the supplier (voided check, bank statement) if they wish to provide an alternate account. Follow FCRA obligations if taking adverse action."},
+choices:["Process the payment — the supplier is a known vendor","Do not process — escalate to fraud/risk operations and request an alternate account","Pay a partial amount while the risk is investigated","Ask the supplier to re-submit the same account details"],correct:1,
+explain:"A DECLINE (RT01) with a closed account history means the OAN agent is advising you not to process. Escalate to fraud/risk operations, request alternate banking details, and follow FCRA obligations if adverse action is taken."},
+
+{category:"Email validation — Low fraud risk",question:"The OAN agent's Email Screening Intelligence (ESI) service checks jane.doe@gmail.com and returns StatusID 14: Email Created at Least 5 Years Ago, Lower Fraud Risk. Owner: Jane Doe, Smith & Associates, Tax Accountant. What action should the AP team take?",
+vendor:{name:"jane.doe@gmail.com",type:"Email risk screening (ESI)",avatar:"@J",ab:"#E1F5EE",ac:"#0F6E56",
+stats:[{i:"ti-mail",l:"Email status",v:"StatusID 14 — Lower Fraud Risk",r:"l"},{i:"ti-user",l:"Owner",v:"Jane Doe — Smith & Associates",r:"l"},{i:"ti-calendar",l:"Email age",v:"Created 2010 — first seen 2012",r:"l"},{i:"ti-send",l:"Deliverability",v:"Deliverable — no flags",r:"l"},{i:"ti-world",l:"Domain",v:"gmail.com — Google webmail",r:"m"},{i:"ti-shield",l:"OAN ESI signal",v:"Lower Fraud Risk",r:"l"}],rl:"l",
+hint:"StatusID 14 (created 5+ years ago) combined with a named owner and Lower Fraud Risk is a positive ESI outcome. The email is established and longstanding. The one caveat is that it's a webmail address (gmail.com) rather than a corporate domain.",
+advice:"For routine communications and low-value transactions, proceed as normal. For onboarding, account changes, or higher-risk transactions, confirm identity with an additional check — phone OTP, request a corporate email, or government ID match. The webmail domain means you have less corporate affiliation assurance despite the named owner."},
+choices:["Block the email — gmail.com accounts cannot be trusted for supplier onboarding","Proceed normally for low-risk actions; require additional verification for high-value onboarding","Require a corporate email before any further communication","Escalate to the compliance team — all webmail is flagged"],correct:1,
+explain:"StatusID 14 with a named owner and Lower Fraud Risk means the email is established and low risk. Proceed normally for routine actions. For high-value onboarding, request additional verification since it is a webmail address rather than a corporate domain."},
+
+{category:"OFAC / Sanctions screening",question:"The OAN agent runs an OFAC sanctions screen on the business name 'Sniper Africa' and returns a Potential Match Level 1 under the SDGT (Specially Designated Global Terrorist) program. Aliases include SNIPER OUTDOOR CC and TRUE MOTIVES 1236 CC. What must AP do immediately?",
+vendor:{name:"Sniper Africa",type:"OFAC / Sanctions screening",avatar:"!",ab:"#FCEBEB",ac:"#791F1F",
+stats:[{i:"ti-alert-triangle",l:"OFAC result",v:"Potential Match Level 1 — SDGT",r:"h"},{i:"ti-users",l:"Aliases",v:"Sniper Outdoor CC; True Motives 1236",r:"h"},{i:"ti-id",l:"Registration ID",v:"200302847123",r:"h"},{i:"ti-shield",l:"OAN risk signal",v:"CRITICAL — halt all activity",r:"h"},{i:"ti-globe",l:"Website",v:"www.sniperafrica.com",r:"h"},{i:"ti-map-pin",l:"Location",v:"Johannesburg, South Africa",r:"h"}],rl:"h",
+hint:"A Potential Match Level 1 under SDGT is the highest risk OFAC outcome the agent can return. This means the entity may be a Specially Designated Global Terrorist. All transactions and onboarding must stop immediately and escalate to compliance.",
+advice:"Immediately pause all transactions and onboarding related to Sniper Africa. Escalate to your compliance and legal/AML teams for immediate review. Preserve and export all match records for regulatory/audit purposes. Follow internal suspicious-activity and sanctions-reporting procedures. Do not engage or facilitate any transactions until compliance provides explicit clearance."},
+choices:["Continue onboarding — it may be a false positive","Pay the invoice and flag for compliance review afterward","Immediately pause all transactions and escalate to compliance and legal — treat as a confirmed sanctions hit until cleared","Run the OFAC check again with a different spelling and proceed if no match is found"],correct:2,
+explain:"A Potential Match Level 1 SDGT hit requires immediate cessation of all transactions and escalation to compliance. You must treat it as a confirmed sanctions hit until your compliance and legal teams formally clear it."},
+
+{category:"Consumer identity — Accept With Risk",question:"The OAN agent runs a consumer identity check for John Smith (DOB 1970-05-15, address 1923 Lake Forest Rd, Grapevine TX, Tax ID 123456543). The result is Accept With Risk — identity score 947/975 with two fraud insights: F032 (address line mismatch) and F090 (phone number missing from inquiry). What should AP do?",
+vendor:{name:"John C. Smith",type:"Consumer identity verification",avatar:"JS",ab:"#FAEEDA",ac:"#633806",
+stats:[{i:"ti-user",l:"Identity match",v:"John C. Smith — DOB confirmed",r:"l"},{i:"ti-chart-bar",l:"Identity score",v:"947 / 975 — high confidence",r:"l"},{i:"ti-map-pin",l:"F032 flag",v:"Address line mismatch",r:"m"},{i:"ti-phone",l:"F090 flag",v:"Phone missing from inquiry",r:"m"},{i:"ti-id",l:"Tax ID",v:"CO issuance 1984-85 — partial match",r:"l"},{i:"ti-shield",l:"OAN ESI signal",v:"Accept with risk",r:"m"}],rl:"m",
+hint:"A score of 947/975 is very strong — this is almost certainly John Smith. However, the address-line mismatch (F032) and the missing phone input (F090) are risk signals that need to be resolved before high-trust actions. The agent recommends requesting proof of address and phone verification.",
+advice:"For low-risk activity, you may proceed but document the exception. For higher-risk actions (large payments, onboarding, credit decisions), request proof of address (utility bill or bank statement) and perform phone verification before proceeding. Do not use this result alone to take adverse action under FCRA."},
+choices:["Reject the identity — any fraud insight means the person cannot be verified","Proceed for all purposes — a score of 947/975 is sufficient","Proceed for low-risk actions but resolve the address mismatch and phone flag before high-risk actions","Immediately escalate to fraud — an address mismatch means identity theft"],correct:2,
+explain:"Accept With Risk at 947/975 means a strong match exists but two data quality flags need resolution. Proceed for low-risk activity, but require proof of address and phone verification for high-value or regulated actions. Document everything for FCRA compliance."},
+
+{category:"Business identity — Name mismatch",question:"The OAN agent verifies business 'Sand Stories LLC' (FEIN 111222333, 12 Shady Lane, Stockton CA). The system returns a risk alert: the record on file is for 'Stockton Productions Inc' (different legal name, FEIN ends in 2333). Addresses and phone match. What should AP do?",
+vendor:{name:"Sand Stories LLC / Stockton Productions Inc",type:"Business identity verification",avatar:"BV",ab:"#FCEBEB",ac:"#791F1F",
+stats:[{i:"ti-building",l:"Submitted name",v:"Sand Stories LLC",r:"h"},{i:"ti-building",l:"Matched legal name",v:"Stockton Productions Inc",r:"h"},{i:"ti-id",l:"FEIN match",v:"Ends in 2333 — partial",r:"m"},{i:"ti-map-pin",l:"Address",v:"12 Shady Ln, Stockton CA — matches",r:"l"},{i:"ti-phone",l:"Phone",v:"212-098-2298 — matches",r:"l"},{i:"ti-shield",l:"OAN risk signal",v:"Risk alert — name mismatch",r:"h"}],rl:"h",
+hint:"The address and phone match but the legal name does not. This could be a legitimate DBA/alias situation or it could be misrepresentation. The OAN agent returns a Risk Alert — meaning you should not proceed without resolving the legal name discrepancy.",
+advice:"Hold all high-risk activity. Request official formation documents from the supplier: FEIN confirmation letter (IRS CP575), articles of organization or certificate of formation, and a recent bank statement or utility bill showing the business name. Ask whether Sand Stories LLC is a DBA of Stockton Productions Inc and request DBA registration documentation if so."},
+choices:["Approve — the address and phone match so the business is legitimate","Hold all high-risk activity and request FEIN confirmation and formation documents to resolve the name mismatch","Pay the invoice — FEIN suffix matches so it must be the same entity","Reject permanently — different legal names cannot be reconciled"],correct:1,
+explain:"A legal name mismatch is a material risk signal even when address and phone match. The OAN agent returns a Risk Alert specifically because of this. You must request formation documents and FEIN confirmation before proceeding with onboarding or payments."},
+
+{category:"Email validation — Suspected fraud",question:"The OAN ESI service validates 304fpd@gmail.com and returns StatusID 63: Suspected Fraud, FraudType: FirstPaymentDefault, FraudSourceIndustry: Telecommunications. First seen 2013. No owner details returned. What must AP do?",
+vendor:{name:"304fpd@gmail.com",type:"Email risk screening (ESI)",avatar:"@!",ab:"#FCEBEB",ac:"#791F1F",
+stats:[{i:"ti-mail",l:"Email status",v:"StatusID 63 — Suspected Fraud",r:"h"},{i:"ti-alert-triangle",l:"Fraud type",v:"First Payment Default",r:"h"},{i:"ti-building",l:"Source industry",v:"Telecommunications",r:"h"},{i:"ti-calendar",l:"First seen",v:"April 1, 2013",r:"m"},{i:"ti-user",l:"Owner",v:"No owner details returned",r:"h"},{i:"ti-shield",l:"OAN ESI signal",v:"Fraud Review required",r:"h"}],rl:"h",
+hint:"StatusID 63 (Suspected Fraud) combined with a fraud type of First Payment Default is a serious ESI signal. The OAN agent advises suspending high-risk processing, placing in manual review, and requiring independent verification before any sensitive actions.",
+advice:"Do not complete high-risk transactions or onboarding tied to this email. Perform a manual fraud review and escalate per your fraud policy. Require stronger proof of identity from the user (government ID, proof of address), or require an alternative corporate email and a verified phone number."},
+choices:["Proceed — StatusID 63 is a moderate signal and the domain is low risk","Approve with monitoring — the email has been active since 2013","Suspend high-risk processing, place in manual fraud review, and require independent identity verification","Send a verification email and proceed if the recipient responds"],correct:2,
+explain:"StatusID 63 (Suspected Fraud / First Payment Default) is a serious ESI signal that requires immediate escalation. Do not proceed with any high-risk transactions. Manual fraud review and independent identity verification are mandatory."},
+
+{category:"Bank account — Non-DDA (prepaid card)",question:"The OAN agent validates routing 124071889 / account 987654321 and identifies it as a Prepaid Debit product at American Express Centurion Bank. The agent flags this and advises not to accept for payment. What is the correct AP action?",
+vendor:{name:"American Express Centurion Bank",type:"Bank account validation — Non-DDA",avatar:"AX",ab:"#FAEEDA",ac:"#633806",
+stats:[{i:"ti-building-bank",l:"Routing",v:"124071889 — AmEx Centurion",r:"m"},{i:"ti-credit-card",l:"Account type",v:"Prepaid Debit — Non-DDA",r:"h"},{i:"ti-x",l:"OAN recommendation",v:"Do not accept for payment",r:"h"},{i:"ti-user",l:"Identity data",v:"No customer identity returned",r:"h"},{i:"ti-history",l:"Account history",v:"No positive/negative activity",r:"m"},{i:"ti-shield",l:"OAN risk signal",v:"High risk — prepaid instrument",r:"h"}],rl:"h",
+hint:"Prepaid debit cards are not eligible for ACH/payment processing in most B2B contexts. The OAN agent flags this as a non-DDA (non-Demand Deposit Account) prepaid instrument and explicitly advises not to accept. No customer identity data was returned.",
+advice:"Do not accept this account for payment or onboarding. Request a standard business checking or savings account from the supplier. Inform them that prepaid debit cards are not accepted for supplier payments. Request a voided check or bank letter from an eligible account."},
+choices:["Accept the prepaid card — it is a valid American Express product","Request that the supplier provide a standard business checking or savings account instead","Approve with a transaction limit until identity is verified","Run an identity check and proceed if identity is confirmed"],correct:1,
+explain:"Prepaid debit accounts (Non-DDA) are not appropriate for supplier payments and ACH processing. The OAN agent correctly flags this. Request a standard checking or savings account from the supplier and provide a voided check or bank letter to verify."},
+
+{category:"Business identity — Verified pass",question:"The OAN agent verifies GIACT Systems, LLC (FEIN 123498765, 700 Central Expy S Suite 300, Allen TX 75013). The result is a PASS: business verified, DUNS 887766554, incorporated in Delaware 2014-12-22, no sanctions matches. What should AP do?",
+vendor:{name:"GIACT Systems, LLC",type:"Business identity verification",avatar:"GS",ab:"#E1F5EE",ac:"#0F6E56",
+stats:[{i:"ti-building",l:"Legal name",v:"GIACT Systems, LLC — verified",r:"l"},{i:"ti-id",l:"FEIN",v:"123498765 — confirmed",r:"l"},{i:"ti-chart-bar",l:"DUNS",v:"887766554",r:"l"},{i:"ti-calendar",l:"Incorporated",v:"Delaware — Dec 22, 2014",r:"l"},{i:"ti-globe",l:"Domain",v:"giact.com",r:"l"},{i:"ti-shield",l:"OFAC / Sanctions",v:"No matches identified",r:"l"}],rl:"l",
+hint:"A business identity PASS with DUNS confirmed, no sanctions matches, and address/phone verified is the best possible outcome from the OAN agent. This entity can be considered verified for routine onboarding subject to internal policy.",
+advice:"Proceed with onboarding and update your vendor records with the verified legal name, FEIN, DUNS, address, and primary contacts. If you require full FEIN disclosure or original documentation for compliance records, request an EIN confirmation letter or articles of incorporation. For enhanced due diligence, run a full FEIN/IRS validation or expanded sanctions screening."},
+choices:["Hold onboarding pending manual review — automated checks are never sufficient","Proceed with onboarding and update vendor records with the verified details","Require 30 days of payment history before completing onboarding","Run a second manual verification before accepting the result"],correct:1,
+explain:"A PASS on OAN's business identity verification with DUNS confirmed and no sanctions matches means the entity is verified for routine onboarding. Proceed and update your records. Request original documentation only if your enhanced due diligence policy requires it."},
+
+{category:"Consumer identity — Partial match",question:"The OAN agent runs a consumer identity check for Robert Williams (TaxId 123456777, DOB 1968-04-21) with no address or phone provided. The result is a Partial Match: identity score 516/825, Tax ID mismatch detected, multiple historical addresses on file (TX, CO, MI). What should AP do?",
+vendor:{name:"Robert Williams",type:"Consumer identity verification",avatar:"RW",ab:"#FAEEDA",ac:"#633806",
+stats:[{i:"ti-user",l:"Identity match",v:"Robert Williams — partial",r:"m"},{i:"ti-chart-bar",l:"Identity score",v:"516 / 825 — moderate confidence",r:"m"},{i:"ti-id",l:"Tax ID",v:"Mismatch detected",r:"h"},{i:"ti-map-pin",l:"Address",v:"Not provided — flagged",r:"h"},{i:"ti-phone",l:"Phone",v:"Not provided — flagged",r:"h"},{i:"ti-shield",l:"OAN risk signal",v:"Accept with risk — partial",r:"m"}],rl:"m",
+hint:"516/825 is a moderate score — a match was found but it's not strong. The Tax ID mismatch is the most serious flag. Missing address and phone inputs reduce the quality of the check. This is a partial verification that is not sufficient for high-risk actions.",
+advice:"Do not proceed with high-risk onboarding or fund movement based on this result alone. Request supporting documentation: government ID showing name and DOB, proof of address (utility bill or bank statement), and confirmation of the Tax ID. Provide address and phone for the OAN agent and re-run the check to improve the match quality."},
+choices:["Approve — a match was found so the identity is verified","Proceed with low-risk activity only; require government ID, proof of address, and Tax ID confirmation before high-risk actions","Reject permanently — a Tax ID mismatch means the person cannot be verified","Run the check again without any inputs and see if the score improves"],correct:1,
+explain:"A partial match at 516/825 with a Tax ID mismatch and missing address/phone is not sufficient for high-risk actions. Require government ID, proof of address, and Tax ID confirmation. Re-run the check with complete inputs before proceeding with onboarding or payments."}
+]
+
+};
+
+/* ── GAME ENGINE ── */
+(function(){
+var ROUNDS=5;
+var LEVEL_TIME={beginner:90000,advanced:60000,expert:45000,supplier:60000};
+var MAX_PTS=200;
+var score=0,round=0,correctCount=0,missedCount=0,lifelines=3,callsUsed=0;
+var timerInterval=null,timerStart=null,timerElapsed=0,roundActive=false,paused=false,agentOpen=false,winShown=false;
+var currentScenario=null,deck=[],currentLevel=null,roundTime=60000;
+var streak=0;
+
+
+/* ══════════════════════════════════════════════════════════
+   AP SOP LIBRARY  — Standard Operating Procedures
+   Each SOP is keyed to a scenario category.
+   The agent presents the relevant SOP as next steps.
+══════════════════════════════════════════════════════════ */
+var AP_SOP = {
+
+  "first_time_vendor": {
+    title: "SOP: First-Time Vendor Invoice",
+    ref: "AP-SOP-001",
+    trigger: "Any invoice from a vendor with zero prior payment history",
+    steps: [
+      "Place the invoice ON HOLD — do not approve, do not pay",
+      "Verify the vendor's EIN against IRS records (call IRS TIN matching or use OAN Verify)",
+      "Call the vendor on a phone number sourced independently — NOT from the invoice",
+      "Confirm the bank account via out-of-band verification (call the bank directly)",
+      "Obtain a signed W-9 with a verified EIN before any payment",
+      "For amounts over $10,000 — require secondary manager approval",
+      "Document all verification steps in the invoice notes before releasing"
+    ],
+    escalate: "Any first-time vendor over $25,000 — escalate to AP Supervisor before paying"
+  },
+
+  "bank_account_change": {
+    title: "SOP: Bank Account or Payment Method Change",
+    ref: "AP-SOP-002",
+    trigger: "Any request to update routing number, account number, or payment method",
+    steps: [
+      "FREEZE the pending payment immediately — do not process",
+      "Reject any change submitted via email alone — require portal submission",
+      "Call the vendor on the verified number in your vendor master (NOT from the email)",
+      "Ask the vendor to confirm: last invoice amount, last payment date, their internal contact name",
+      "Require a voided check or bank letter on official letterhead for the new account",
+      "Re-validate the new account through OAN bank verification before updating",
+      "Log the change request, the call-back, and the verification in your audit trail"
+    ],
+    escalate: "Any bank change within 72 hours of a payment over $50,000 — escalate to Controller"
+  },
+
+  "duplicate_payment": {
+    title: "SOP: Duplicate Invoice or Payment",
+    ref: "AP-SOP-003",
+    trigger: "OAN agent flags a matching invoice number, amount, or vendor already paid",
+    steps: [
+      "Flag the invoice as DUPLICATE — do not approve or pay",
+      "Pull the original payment record and confirm: date, amount, bank account, confirmation number",
+      "Contact the vendor directly by phone to confirm they received the original payment",
+      "Ask the vendor to confirm their bank account received the funds (ACH trace if needed)",
+      "If vendor confirms receipt — reject the second submission with a written note",
+      "If vendor claims non-receipt — initiate an ACH trace through your bank before any re-payment",
+      "Document all findings in the duplicate review log"
+    ],
+    escalate: "If the second submission came from a different email or channel — escalate to fraud team"
+  },
+
+  "contact_change": {
+    title: "SOP: Vendor Contact or Email Change",
+    ref: "AP-SOP-004",
+    trigger: "Primary contact email, phone, or address changed outside the self-service portal",
+    steps: [
+      "Do NOT update vendor master based on an email request alone",
+      "Require the vendor to submit the change through the self-service portal with authentication",
+      "Call the vendor on the OLD verified phone number to confirm the change is legitimate",
+      "Verify the new contact logs into the portal before treating the change as confirmed",
+      "If an invoice arrives from the new contact before portal login is confirmed — HOLD the invoice",
+      "Document the verification call (date, time, person spoken to) before updating the record",
+      "Flag the vendor record for enhanced monitoring for 30 days after any contact change"
+    ],
+    escalate: "Invoice arrives within 48 hours of an unverified contact change — escalate to fraud team"
+  },
+
+  "dormant_vendor": {
+    title: "SOP: Dormant Vendor Reactivation",
+    ref: "AP-SOP-005",
+    trigger: "Vendor inactive for more than 12 months submits a new invoice",
+    steps: [
+      "Place the invoice ON HOLD — treat as a first-time vendor review",
+      "Require a fresh, signed W-9 — expired W-9s are an automatic hard stop",
+      "Re-verify the bank account — do not use the bank account on file without fresh confirmation",
+      "Call the vendor on their last known verified phone number to confirm the reactivation",
+      "Review the invoice amount against historical averages — flag anything over 2x the average",
+      "Require secondary manager approval for any dormant vendor payment over $10,000",
+      "Update the vendor record with the verification date and approver name"
+    ],
+    escalate: "New bank account + invoice over 3x historical average = escalate to AP Supervisor"
+  },
+
+  "payment_anomaly": {
+    title: "SOP: Unusual Invoice Amount or Pattern",
+    ref: "AP-SOP-006",
+    trigger: "Invoice amount is significantly above vendor's historical average or lacks a PO",
+    steps: [
+      "Hold the invoice — do not approve without a matching PO or budget owner sign-off",
+      "Pull the vendor's 12-month payment history and calculate the average invoice amount",
+      "If the invoice is more than 2x the average — require a PO or written approval from the budget owner",
+      "Contact the internal requester to confirm the goods or services were actually ordered",
+      "Verify the invoice description matches the purchase order line items",
+      "For invoices with no PO — require a retroactive PO before approval",
+      "Document the anomaly and the budget owner's approval in the invoice notes"
+    ],
+    escalate: "Invoice over 3x average with no PO and end-of-period timing — escalate to Controller"
+  },
+
+  "approval_limit": {
+    title: "SOP: Approval Limit and Authorization Controls",
+    ref: "AP-SOP-007",
+    trigger: "Invoice submitted for approval that exceeds the approver's authorization limit",
+    steps: [
+      "Return the invoice to the workflow — do not process with insufficient approval",
+      "Identify the correct approval level required based on the invoice amount",
+      "Route to the appropriate approver at the correct authorization tier",
+      "Do not split a single invoice into smaller amounts to avoid approval thresholds",
+      "Confirm the approver has no conflict of interest with this vendor",
+      "Obtain and retain written approval before releasing payment",
+      "Log the approval chain in the invoice record for audit purposes"
+    ],
+    escalate: "Any invoice where an approver is also the person who added the vendor — escalate to audit"
+  },
+
+  "internal_fraud": {
+    title: "SOP: Internal Fraud Indicators",
+    ref: "AP-SOP-008",
+    trigger: "Vendor data matches an employee address, same-person approval and submission, or threshold splitting",
+    steps: [
+      "Do NOT alert the employee — preserve the element of surprise for the investigation",
+      "Freeze all pending payments to the suspect vendor immediately",
+      "Escalate to Internal Audit and your Compliance Officer within 1 business hour",
+      "Preserve all records — emails, payment history, vendor master changes — under legal hold",
+      "Do not delete or modify any system records related to the vendor or the employee",
+      "Contact your external auditors if the total exposure exceeds $25,000",
+      "Follow your organization's whistleblower and fraud reporting policy"
+    ],
+    escalate: "ALWAYS escalate internal fraud indicators — never attempt to resolve independently"
+  },
+
+  "ofac_sanctions": {
+    title: "SOP: OFAC / Sanctions Match",
+    ref: "AP-SOP-009",
+    trigger: "OAN agent returns a potential or confirmed OFAC/SDGT sanctions match on a vendor or business",
+    steps: [
+      "IMMEDIATELY halt all transactions and onboarding for the named entity",
+      "Do not notify the vendor or supplier that a screening has occurred",
+      "Escalate to your Chief Compliance Officer and Legal Counsel within 1 hour",
+      "Preserve the full screening output — names, aliases, addresses, identifiers — for audit",
+      "Your compliance team must determine: confirmed match, false positive, or needs more data",
+      "If confirmed — block all accounts, freeze funds if held, and report to regulators as required",
+      "Do not re-engage with the entity until Compliance provides written clearance"
+    ],
+    escalate: "OFAC/SDG match is ALWAYS a mandatory escalation — no exceptions"
+  },
+
+  "email_risk": {
+    title: "SOP: High-Risk Email Address on Supplier Record",
+    ref: "AP-SOP-010",
+    trigger: "OAN ESI screening returns Suspected Fraud, High Risk, or Identity Theft on a contact email",
+    steps: [
+      "Suspend all high-risk transactions tied to this email address",
+      "Do not send any sensitive documents, payment confirmations, or bank details to this address",
+      "Contact the vendor by phone (verified number in vendor master) to confirm the email is legitimate",
+      "Request the vendor submit a verified corporate email address through the self-service portal",
+      "Require government ID or official business documentation before reactivating the contact",
+      "Place the vendor record under enhanced monitoring for 60 days",
+      "Document all verification steps and escalate if the vendor cannot confirm the contact email"
+    ],
+    escalate: "FraudType: IdentityTheft or FirstPaymentDefault — escalate to fraud team immediately"
+  },
+
+  "bank_validation_decline": {
+    title: "SOP: Bank Account Validation — Decline or Non-DDA",
+    ref: "AP-SOP-011",
+    trigger: "OAN bank validation returns Decline, RT01, GS01, GS02, or Non-DDA (RT04)",
+    steps: [
+      "Do not process any payment to the declined or invalid account",
+      "Notify the vendor that their bank account could not be verified for payment",
+      "Request a voided check or official bank letter showing an eligible open account",
+      "For Non-DDA (prepaid, credit line, HELOC) — request a standard checking account",
+      "Re-run OAN bank validation after receiving corrected account details",
+      "If the vendor insists the account is correct — request a direct funds confirmation from the bank",
+      "Follow FCRA adverse action notice requirements if applicable to your use case"
+    ],
+    escalate: "Vendor provides a third account after two declines — escalate to fraud team"
+  },
+
+  "identity_mismatch": {
+    title: "SOP: Consumer or Business Identity Mismatch",
+    ref: "AP-SOP-012",
+    trigger: "OAN identity check returns name mismatch, Tax ID mismatch, or partial match with risk",
+    steps: [
+      "Do not complete onboarding or release funds until the identity discrepancy is resolved",
+      "Request government-issued photo ID from the individual (passport or driver's license)",
+      "Request proof of address from the last 90 days (utility bill or bank statement)",
+      "For Tax ID mismatch — request an IRS EIN confirmation letter (Form CP-575)",
+      "For business name mismatch — request articles of incorporation and FEIN confirmation",
+      "Re-run the OAN identity check after receiving corrected documentation",
+      "If the discrepancy cannot be resolved — reject the onboarding and document the reason"
+    ],
+    escalate: "Identity score below 600 with Tax ID mismatch — escalate to compliance for manual review"
+  },
+
+  "default": {
+    title: "SOP: General AP Fraud Prevention",
+    ref: "AP-SOP-000",
+    trigger: "General AP fraud review guidance",
+    steps: [
+      "Never approve a payment based on a single unverified data point — always cross-check",
+      "When in doubt, HOLD the payment — a delayed payment is always recoverable; a fraudulent one may not be",
+      "Call vendors on numbers from your vendor master — never from the invoice or an email",
+      "Any change to bank account, contact email, or remittance address requires out-of-band verification",
+      "Use OAN's risk score as your first filter — any score above 70 requires manual review",
+      "Document every verification step — date, time, who you spoke to, what was confirmed",
+      "Escalate early — it is always better to involve a supervisor than to approve a suspicious payment"
+    ],
+    escalate: "If you are unsure whether to escalate — escalate. The cost of a false alarm is zero."
+  }
+
+};
+
+// Map scenario categories to SOP keys
+var CATEGORY_SOP_MAP = {
+  "First-time vendor":             "first_time_vendor",
+  "Bank account change":           "bank_account_change",
+  "Duplicate payment":             "duplicate_payment",
+  "Contact change":                "contact_change",
+  "Communication change":          "contact_change",
+  "Dormant vendor":                "dormant_vendor",
+  "Inactive vendor reactivation":  "dormant_vendor",
+  "Payment anomaly":               "payment_anomaly",
+  "Early payment discount fraud":  "payment_anomaly",
+  "Approval workflow":             "approval_limit",
+  "Invoice timing patterns":       "approval_limit",
+  "Vendor master data":            "bank_account_change",
+  "Payment methods":               "bank_account_change",
+  "Internal fraud indicators":     "internal_fraud",
+  "Vendor consolidation fraud":    "internal_fraud",
+  "Procurement fraud":             "internal_fraud",
+  "Insider threat — procurement collusion": "internal_fraud",
+  "Collusion and segregation of duties":    "internal_fraud",
+  "OFAC / Sanctions screening":    "ofac_sanctions",
+  "Email validation — Suspected fraud":     "email_risk",
+  "Email validation — Low fraud risk":      "email_risk",
+  "Email risk":                    "email_risk",
+  "Bank account validation — Decline":      "bank_validation_decline",
+  "Bank account — Non-DDA (prepaid card)":  "bank_validation_decline",
+  "Consumer identity — Accept With Risk":   "identity_mismatch",
+  "Consumer identity — Partial match":      "identity_mismatch",
+  "Business identity — Name mismatch":      "identity_mismatch",
+  "Business identity — Verified pass":      "identity_mismatch",
+  "Bank account validation — Pass":         "bank_validation_decline",
+  "W-9 verification":              "first_time_vendor",
+  "Three-way match":               "payment_anomaly",
+  "Invoice red flags":             "first_time_vendor",
+  "Split-payment fraud scheme":    "internal_fraud",
+  "Invoice factoring fraud":       "bank_account_change",
+  "Remittance fraud":              "bank_account_change",
+  "AI-generated invoice fraud":    "payment_anomaly",
+  "Shell company network":         "internal_fraud",
+  "Supply chain invoice injection":"internal_fraud",
+  "Synthetic identity fraud":      "identity_mismatch",
+  "Payment redirect via invoice portal": "bank_account_change",
+  "Deepfake and social engineering":     "internal_fraud"
+};
+
+function getSOP(sc){
+  var key=CATEGORY_SOP_MAP[sc.category]||'default';
+  return AP_SOP[key]||AP_SOP['default'];
+}
+
+function getResp(sc,q){
+  q=(q||'').toLowerCase();
+  if(q.includes('action')||q.includes('take')||q.includes('approve')||q.includes('safe')||q.includes('recommend')||q.includes('next step')||q.includes('policy')||q.includes('sop'))return sc.advice;
+  return sc.hint;
+}
+
+function buildSampleAnswer(sc){
+  var letters=['A','B','C','D'];
+  return {letter:letters[sc.correct],text:sc.choices[sc.correct],why:sc.explain};
+}
+
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/* ── AGENT STATE ─────────────────────────────── */
+var agentShownSOP={};   // round_id → bool
+var agentShownAns={};   // round_id → bool
+
+function resetAgent(){
+  currentRound_id=round;
+  document.getElementById('agentInp').value='';
+  document.getElementById('thinkRow').style.display='none';
+  document.getElementById('noLl').style.display='none';
+  document.getElementById('quickAsks').innerHTML='';
+  renderAgentPanel();
+}
+
+/* ── VENDOR INSIGHT — rendered inside OAN Assist ─ */
+function renderVendorInsight(sc,msgs){
+  var v=sc.vendor;
+  var RL={h:{cls:'rh',lbl:'High risk'},m:{cls:'rm',lbl:'Medium risk'},l:{cls:'rl2',lbl:'Low risk'}};
+  var rc=RL[v.rl];
+  var div=document.createElement('div');
+  div.className='insight-card';
+  var statsHtml=v.stats.map(function(st){
+    var fc={h:'sv-h',m:'sv-m',l:'sv-l'}[st.r||'l'];
+    return '<div class="insight-stat"><div class="stat-l"><i class="ti '+escHtml(st.i)+'" aria-hidden="true"></i> '+escHtml(st.l)+'</div><div class="stat-v '+fc+'">'+escHtml(st.v)+'</div></div>';
+  }).join('');
+  div.innerHTML=
+    '<div class="insight-vendor-head">'+
+      '<div class="vc-av" style="background:'+escHtml(v.ab)+';color:'+escHtml(v.ac)+';width:2.5rem;height:2.5rem;font-size:1rem">'+escHtml(v.avatar)+'</div>'+
+      '<div style="flex:1"><div class="insight-vendor-nm">'+escHtml(v.name)+'</div><div class="insight-vendor-ty">'+escHtml(v.type)+'</div></div>'+
+      '<span class="risk-pill '+rc.cls+'"><i class="ti ti-shield" style="font-size:.8rem" aria-hidden="true"></i> '+rc.lbl+'</span>'+
+    '</div>'+
+    '<div class="insight-scan-row"><span class="scan-tag"><span class="pulse"></span> OAN agent — analysis complete</span></div>'+
+    '<div class="insight-stats">'+statsHtml+'</div>'+
+    '<div class="insight-ai-text"><i class="ti ti-sparkles" aria-hidden="true"></i><span>'+escHtml(v.hint)+'</span></div>';
+  msgs.appendChild(div);
+}
+
+/* ── MAIN PANEL RENDERER ─────────────────────── */
+function renderAgentPanel(){
+  var sc=currentScenario;
+  var locked=(lifelines<=0);
+  var msgs=document.getElementById('agentMsgs');
+  msgs.innerHTML='';
+  var shownSOP=!!agentShownSOP[currentRound_id];
+  var shownAns=!!agentShownAns[currentRound_id];
+
+  /* ── INTRO (first round only, shown once) ── */
+  if(!agentShownIntro){
+    agentShownIntro=true;
+    var intro=document.createElement('div');
+    intro.className='oan-intro-msg';
+    intro.innerHTML='<strong><i class="ti ti-sparkles" aria-hidden="true"></i> Hi, I\'m OAN Assist</strong>'+
+      '<p>I\'m your AI-powered AP co-pilot. I pre-analyze every invoice and surface the risk signals you need to make fast, compliant decisions — just like in the real OAN product.</p>'+
+      '<p style="margin-top:6px;color:rgba(255,255,255,.6);font-size:.8rem">I\'ve already analyzed this invoice. See my findings below.</p>';
+    msgs.appendChild(intro);
+  }
+
+  /* ── INSIGHT LABEL ── */
+  var lbl=document.createElement('div');
+  lbl.className='insight-section-lbl';
+  lbl.textContent='Invoice analysis';
+  msgs.appendChild(lbl);
+
+  /* ── VENDOR INSIGHT (always shown) ── */
+  renderVendorInsight(sc,msgs);
+
+  /* ── HINT SECTION ── */
+  if(!shownSOP){
+    if(!locked){
+      var sopBtn=document.createElement('button');
+      sopBtn.className='agent-sop-btn';
+      sopBtn.innerHTML='<i class="ti ti-clipboard-list" aria-hidden="true"></i> Show SOP &amp; next steps <span class="agent-sop-cost">uses 1 hint · pauses timer</span>';
+      sopBtn.addEventListener('click',function(){
+        if(lifelines<=0)return;
+        lifelines--;callsUsed++;syncLL();
+        agentShownSOP[currentRound_id]=true;
+        pauseTimer();
+        document.getElementById('thinkRow').style.display='flex';
+        msgs.scrollTop=msgs.scrollHeight;
+        setTimeout(function(){
+          document.getElementById('thinkRow').style.display='none';
+          renderAgentPanel();
+          document.getElementById('agentMsgs').scrollTop=9999;
+        },600+Math.random()*300);
+      });
+      msgs.appendChild(sopBtn);
+    }
+  } else {
+    var sopLbl=document.createElement('div');
+    sopLbl.className='insight-section-lbl';
+    sopLbl.textContent='SOP guidance';
+    msgs.appendChild(sopLbl);
+    renderSOPCard(getSOP(sc),msgs);
+    if(!shownAns){
+      if(!locked){
+        var ansBtn=document.createElement('button');
+        ansBtn.className='agent-ans-btn';
+        ansBtn.innerHTML='<i class="ti ti-bulb" aria-hidden="true"></i> Show sample answer <span class="agent-sop-cost">uses 1 hint</span>';
+        ansBtn.addEventListener('click',function(){
+          if(lifelines<=0)return;
+          lifelines--;callsUsed++;syncLL();
+          agentShownAns[currentRound_id]=true;
+          document.getElementById('thinkRow').style.display='flex';
+          setTimeout(function(){
+            document.getElementById('thinkRow').style.display='none';
+            renderAgentPanel();
+            document.getElementById('agentMsgs').scrollTop=9999;
+          },600+Math.random()*300);
+        });
+        msgs.appendChild(ansBtn);
+      }
+    } else {
+      renderAnswerCard(sc,msgs);
+    }
+  }
+
+  document.getElementById('noLl').style.display=locked?'block':'none';
+  document.getElementById('agentSend').disabled=locked;
+  document.getElementById('agentInp').disabled=locked;
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+/* ── SOP CARD ────────────────────────────────── */
+function renderSOPCard(sop,msgs){
+  var div=document.createElement('div');div.className='sop-card';
+  var html='<div class="sop-title"><i class="ti ti-clipboard-list" aria-hidden="true"></i> '+escHtml(sop.title)+'</div>';
+  html+='<div class="sop-ref">'+escHtml(sop.ref)+' &nbsp;·&nbsp; Trigger: '+escHtml(sop.trigger)+'</div>';
+  html+='<div class="sop-steps-lbl">Next steps — in order</div>';
+  html+='<ol class="sop-steps">';
+  sop.steps.forEach(function(s){html+='<li>'+escHtml(s)+'</li>';});
+  html+='</ol>';
+  html+='<div class="sop-escalate"><i class="ti ti-alert-triangle" style="font-size:.85rem" aria-hidden="true"></i> <strong>Escalate when:</strong> '+escHtml(sop.escalate)+'</div>';
+  div.innerHTML=html;
+  msgs.appendChild(div);
+}
+
+/* ── ANSWER CARD ─────────────────────────────── */
+function renderAnswerCard(sc,msgs){
+  var sa=buildSampleAnswer(sc);
+  var div=document.createElement('div');div.className='ans-card';
+  div.innerHTML='<div class="ans-lbl">✦ Sample answer</div>'+
+    '<div class="ans-choice"><strong>Option '+escHtml(sa.letter)+'</strong> — '+escHtml(sa.text)+'</div>'+
+    '<div class="ans-why">'+escHtml(sa.why)+'</div>'+
+    '<button class="ans-go-btn"><i class="ti ti-check" aria-hidden="true"></i> Got it — close and pick this answer</button>';
+  msgs.appendChild(div);
+  div.querySelector('.ans-go-btn').addEventListener('click',closeAgent);
+}
+
+/* ── FREE-TEXT HANDLER ───────────────────────── */
+function askAgent(q){
+  if(lifelines<=0)return;
+  if(!q){q=document.getElementById('agentInp').value.trim();}if(!q)return;
+  lifelines--;callsUsed++;syncLL();
+  document.getElementById('agentInp').value='';
+  document.getElementById('agentSend').disabled=true;
+  document.getElementById('agentInp').disabled=true;
+  pauseTimer();
+  var msgs=document.getElementById('agentMsgs');
+  var ub=document.createElement('div');ub.className='ubub';ub.textContent=q;msgs.appendChild(ub);
+  document.getElementById('thinkRow').style.display='flex';
+  msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(function(){
+    document.getElementById('thinkRow').style.display='none';
+    var qlo=q.toLowerCase();
+    var isSOP=qlo.match(/sop|procedure|policy|step|next|action|what should|do i|approve|safe|recommend/);
+    var resp=isSOP?getSOP(currentScenario).steps.slice(0,4).map(function(s,i){return (i+1)+'. '+s;}).join('\n')
+                  :getResp(currentScenario,q);
+    var ab=document.createElement('div');ab.className='abub';ab.style.whiteSpace='pre-line';ab.textContent=resp;msgs.appendChild(ab);
+    // auto-advance state
+    if(isSOP&&!agentShownSOP[currentRound_id]){agentShownSOP[currentRound_id]=true;}
+    msgs.scrollTop=msgs.scrollHeight;
+    if(lifelines<=0){
+      document.getElementById('noLl').style.display='block';
+      document.getElementById('agentSend').disabled=true;
+      document.getElementById('agentInp').disabled=true;
+    } else {
+      document.getElementById('agentSend').disabled=false;
+      document.getElementById('agentInp').disabled=false;
+    }
+  },800+Math.random()*400);
+}
+
+/* autoOpen=true: don't pause timer (game-driven). autoOpen=false: user toggled, still don't pause timer — timer only pauses when asking for SOP/answer hint inside the panel */
+function openAgent(autoOpen){
+  agentOpen=true;
+  document.getElementById('agentDrawer').classList.add('open');
+  if(!autoOpen)document.getElementById('agentBackdrop').classList.add('open');
+  document.getElementById('agentToggle').classList.add('open');
+  if(!autoOpen)renderAgentPanel();
+}
+function closeAgent(){
+  agentOpen=false;
+  document.getElementById('agentDrawer').classList.remove('open');
+  document.getElementById('agentBackdrop').classList.remove('open');
+  document.getElementById('agentToggle').classList.remove('open');
+}
+document.getElementById('agentToggle').addEventListener('click',function(){agentOpen?closeAgent():openAgent(false);});
+document.getElementById('agentCloseBtn').addEventListener('click',closeAgent);
+document.getElementById('agentBackdrop').addEventListener('click',closeAgent);
+
+function pauseTimer(){if(paused||!roundActive)return;paused=true;timerElapsed+=(Date.now()-timerStart);clearInterval(timerInterval);document.getElementById('pausedTag').style.display='flex';}
+function resumeTimer(){if(!paused||!roundActive)return;paused=false;timerStart=Date.now();document.getElementById('pausedTag').style.display='none';runTick();}
+function startTimer(){clearInterval(timerInterval);timerElapsed=0;timerStart=Date.now();paused=false;var secs=Math.round(roundTime/1000);document.getElementById('timerFill').style.width='100%';document.getElementById('timerFill').style.background='#1D9E75';document.getElementById('timerCd').textContent=secs+'s';document.getElementById('timerCd').style.color='#0F2A44';runTick();}
+function runTick(){clearInterval(timerInterval);timerInterval=setInterval(function(){if(paused)return;var total=timerElapsed+(Date.now()-timerStart);var pct=Math.max(0,100-total/roundTime*100);var secs=Math.ceil(Math.max(0,(roundTime-total)/1000));var fill=document.getElementById('timerFill'),cd=document.getElementById('timerCd');fill.style.width=Math.round(pct)+'%';cd.textContent=secs+'s';if(pct<20){fill.style.background='#E24B4A';cd.style.color='#A32D2D';}else if(pct<50){fill.style.background='#EF9F27';cd.style.color='#854F0B';}else{fill.style.background='#1D9E75';cd.style.color='#0F2A44';}document.querySelector('.timer-row').classList.toggle('danger',pct<20&&pct>0);cd.classList.toggle('urgent',pct<20&&pct>0);if(pct<=0){clearInterval(timerInterval);timeOut();}},100);}
+
+function shuffle(a){var b=[...a];for(var i=b.length-1;i>0;i--){var j=0|Math.random()*(i+1);var t=b[i];b[i]=b[j];b[j]=t;}return b;}
+function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function calcPts(){var total=timerElapsed+(Date.now()-timerStart);return Math.max(50,Math.round(MAX_PTS*(1-total/roundTime*0.6)));}
+function renderPips(el,n,t){if(!el)return;el.innerHTML='';for(var i=0;i<t;i++){var d=document.createElement('div');d.className='ll-p'+(i<n?'':' spent');el.appendChild(d);}}
+function syncLL(){
+  renderPips(document.getElementById('llPips'),lifelines,3);
+  renderPips(document.getElementById('llPips2'),lifelines,3);
+  var t=document.getElementById('llTxt');if(t)t.textContent=lifelines+' hint'+(lifelines!==1?'s':'');
+  var l=document.getElementById('llLbl');if(l)l.textContent=lifelines+' hint'+(lifelines!==1?'s':'')+' remaining';
+  /* agentToggle always active — it's the sidebar toggle, not a hint button */
+}
+function updateHUD(){
+  var sv=document.getElementById('scoreVal');
+  sv.textContent=score;
+  sv.classList.remove('score-pop');void sv.offsetWidth;sv.classList.add('score-pop');
+  var rp=document.getElementById('roundPips');rp.innerHTML='';
+  for(var i=0;i<ROUNDS;i++){var d=document.createElement('div');d.className='pip'+(i<round-1?' done':i===round-1?' now':'');rp.appendChild(d);}
+  var sb=document.getElementById('streakBadge'),sn=document.getElementById('streakNum');
+  if(sb&&sn){
+    var mult=streak>=4?'×1.6':streak===3?'×1.4':streak===2?'×1.2':'';
+    sn.textContent=mult||(streak>0?streak:'');
+    if(streak>=2){
+      sb.classList.add('active');
+      sb.classList.remove('pop');void sb.offsetWidth;sb.classList.add('pop');
+    }else{sb.classList.remove('active');}
+  }
+  syncLL();
+}
+
+window.selectLevel=function(lvl){
+  currentLevel=lvl;
+  document.querySelectorAll('.level-card').forEach(function(c){c.classList.remove('selected');});
+  var card=document.querySelector('.level-card[data-level="'+lvl+'"]');
+  if(card)card.classList.add('selected');
+  document.getElementById('startBtn').disabled=false;
+};
+
+var agentShownIntro=false;
+function startGame(){
+  score=0;round=0;correctCount=0;missedCount=0;lifelines=3;callsUsed=0;winShown=false;agentOpen=false;streak=0;
+  agentShownSOP={};agentShownAns={};agentShownIntro=false;
+  roundTime=LEVEL_TIME[currentLevel]||60000;
+  deck=shuffle(ALL_QUESTIONS[currentLevel]).slice(0,ROUNDS);
+  var db=document.getElementById('diffBadge');
+  var cls={beginner:'diff-b',advanced:'diff-a',expert:'diff-e',supplier:'diff-s'};
+  var lbl={beginner:'Beginner',advanced:'Advanced',expert:'Expert',supplier:'Supplier Identity'};
+  if(db){db.className='diff-badge '+(cls[currentLevel]||'diff-b');db.textContent=lbl[currentLevel]||currentLevel;}
+  document.getElementById('screen-start').style.display='none';
+  document.getElementById('screen-result').style.display='none';
+  showScreen('screen-game');
+  document.getElementById('agentDrawer').classList.remove('open');document.getElementById('agentBackdrop').classList.remove('open');
+  document.getElementById('winOverlay').classList.remove('show');
+  updateHUD();nextRound();
+}
+
+function nextRound(){
+  if(round>=ROUNDS){endGame();return;}
+  currentScenario=deck[round];round++;roundActive=true;paused=false;agentOpen=false;currentRound_id=round;
+  updateHUD();
+  renderScenario();
+  resetAgent();        // populates OAN Assist panel with insight
+  openAgent(true);     // auto-open sidebar — does NOT pause timer
+  startTimer();
+}
+
+function renderScenario(){
+  var s=currentScenario;
+  document.getElementById('scenCat').textContent=s.category;
+  document.getElementById('scenQ').textContent=s.question;
+  document.getElementById('feedback').style.display='none';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('pausedTag').style.display='none';
+  // Vendor card removed from main area — now rendered in OAN Assist via renderVendorInsight()
+  document.getElementById('vendorWrap').innerHTML='';
+  var cb=document.getElementById('choices');cb.innerHTML='';
+  ['A','B','C','D'].forEach(function(ltr,i){var btn=document.createElement('button');btn.className='ch';btn.innerHTML='<span class="ch-idx">'+ltr+'</span><span>'+escH(s.choices[i])+'</span>';btn.addEventListener('click',function(){handlePick(i,btn);});cb.appendChild(btn);});
+}
+
+function checkWin(){if(!winShown&&correctCount>=3){winShown=true;roundActive=false;clearInterval(timerInterval);closeAgent();var rank=getRank(correctCount);document.getElementById('winRankVal').textContent=rank.title;spawnConfetti();setTimeout(function(){document.getElementById('winOverlay').classList.add('show');},600);}}
+document.getElementById('winClose').addEventListener('click',function(){document.getElementById('winOverlay').classList.remove('show');endGame();});
+
+function timeOut(){if(!roundActive)return;roundActive=false;clearInterval(timerInterval);streak=0;document.querySelector('.timer-row').classList.remove('danger');missedCount++;updateHUD();lockChoices();revealCorrect();showFB('timeout','<i class="ti ti-clock-x fb-ic" aria-hidden="true"></i><span>Time expired. '+currentScenario.explain+'</span>');document.getElementById('nextBtn').style.display='block';document.getElementById('nextBtn').innerHTML=round<ROUNDS?'Next question <i class="ti ti-arrow-right" aria-hidden="true"></i>':'See results';}
+
+function handlePick(idx,btn){
+  if(!roundActive)return;
+  roundActive=false;
+  clearInterval(timerInterval);
+  document.querySelector('.timer-row').classList.remove('danger');
+  if(paused)resumeTimer();  // clear paused state cleanly
+  lockChoices();
+  if(idx===currentScenario.correct){
+    streak++;
+    correctCount++;
+    var basePts=calcPts();
+    var mult=streak>=4?1.6:streak===3?1.4:streak===2?1.2:1;
+    var pts=Math.round(basePts*mult);
+    score+=pts;
+    updateHUD();
+    btn.classList.add('correct');
+    floatPts(pts,btn);
+    if(streak===2)showStreakToast('DOUBLE  ×1.2 bonus');
+    else if(streak===3)showStreakToast('TRIPLE  ×1.4 bonus');
+    else if(streak>=4)showStreakToast('ON FIRE  ×1.6 bonus');
+    var multStr=mult>1?' <span style="font-size:.85rem;opacity:.8">×'+mult.toFixed(1)+' streak</span>':'';
+    showFB('correct','<i class="ti ti-check fb-ic" aria-hidden="true"></i><span><span class="pts-badge">+'+pts+' pts</span>'+multStr+' '+currentScenario.explain+'</span>');
+    checkWin();
+  }else{
+    streak=0;
+    missedCount++;
+    updateHUD();
+    btn.classList.add('wrong');
+    revealCorrect();
+    showFB('wrong','<i class="ti ti-x fb-ic" aria-hidden="true"></i><span>'+currentScenario.explain+'</span>');
+  }
+  document.getElementById('nextBtn').style.display='block';
+  document.getElementById('nextBtn').innerHTML=round>=ROUNDS?'See results':'Next question <i class="ti ti-arrow-right" aria-hidden="true"></i>';
+}
+function lockChoices(){document.querySelectorAll('.ch').forEach(function(b){b.disabled=true;});}
+function revealCorrect(){var bs=document.querySelectorAll('.ch');if(bs[currentScenario.correct])bs[currentScenario.correct].classList.add('reveal');}
+function showFB(type,html){var f=document.getElementById('feedback');f.className='fb '+type;f.innerHTML=html;f.style.display='flex';}
+document.getElementById('nextBtn').addEventListener('click',function(){if(!document.getElementById('winOverlay').classList.contains('show'))nextRound();});
+
+function endGame(){
+  clearInterval(timerInterval);document.getElementById('screen-game').style.display='none';showScreen('screen-result');
+  document.getElementById('rScoreN').textContent=score;document.getElementById('rCorrect').textContent=correctCount;document.getElementById('rMissed').textContent=missedCount;document.getElementById('rCalls').textContent=callsUsed;document.getElementById('rAvg').textContent=Math.round(score/ROUNDS);
+  var lbl={beginner:'Beginner',advanced:'Advanced',expert:'Expert',supplier:'Supplier Identity'};document.getElementById('rLevel').textContent=lbl[currentLevel];
+  var rt=document.getElementById('rTitle'),rm=document.getElementById('rMsg'),pi=document.getElementById('rPrizeIcon'),pv=document.getElementById('rPrizeVal'),cm=document.getElementById('rCtaMsg');
+  if(correctCount>=3){rt.textContent='You win a pair of socks!';rm.textContent='You answered '+correctCount+' of 5 correctly at '+lbl[currentLevel]+' level. Head to the oAppsNET booth to collect your prize.';pi.innerHTML='<i class="ti ti-trophy" aria-hidden="true"></i>';pv.textContent='oAppsNET socks — claim at the booth';cm.textContent='Come see the OAN fraud detection agent live in Oracle ERP while you are at the booth.';}
+  else if(correctCount===2){rt.textContent='So close!';rm.textContent='2 of 5 at '+lbl[currentLevel]+' level — just one more and you would have won. Try again or try a different level.';pi.innerHTML='<i class="ti ti-target" aria-hidden="true"></i>';pv.textContent='oAppsNET brochure + demo';cm.textContent='Visit the oAppsNET booth to see how the OAN agent catches these fraud patterns automatically.';}
+  else{rt.textContent='The fraudsters got through...';rm.textContent=score+' points at '+lbl[currentLevel]+' level. The OAN agent catches these patterns 24/7 — come see a live demo at the booth.';pi.innerHTML='<i class="ti ti-chart-line" aria-hidden="true"></i>';pv.textContent='Free AP fraud assessment';cm.textContent='Stop by the oAppsNET booth for a free AP fraud assessment and live demo of the OAN agent.';}
+  // Rank card
+  var rank=getRank(correctCount);
+  document.getElementById('rankIcon').innerHTML=rank.icon;
+  document.getElementById('rankTitle').textContent=rank.title;
+  document.getElementById('rankSub').textContent=rank.sub;
+  document.getElementById('rankScoreN').textContent=score;
+  // High score (per level)
+  var hsKey='oan_hs_'+currentLevel;
+  var prev=parseInt(localStorage.getItem(hsKey)||'0');
+  if(score>prev)localStorage.setItem(hsKey,score);
+}
+
+/* ── SCREEN TRANSITION HELPER ── */
+function showScreen(id){
+  var el=document.getElementById(id);
+  el.style.display='block';
+  el.classList.remove('screen-enter');
+  void el.offsetWidth;
+  el.classList.add('screen-enter');
+}
+
+/* ── FLOATING SCORE POPUP ── */
+function floatPts(pts,btn){
+  var rect=btn.getBoundingClientRect();
+  var el=document.createElement('div');
+  el.className='float-pts';
+  el.textContent='+'+pts+' pts';
+  el.style.left=Math.max(10,rect.left+rect.width/2-55)+'px';
+  el.style.top=(rect.top-8)+'px';
+  document.body.appendChild(el);
+  setTimeout(function(){if(el.parentNode)el.remove();},950);
+}
+
+/* ── STREAK TOAST ── */
+function showStreakToast(msg){
+  var old=document.querySelector('.streak-toast');if(old)old.remove();
+  var el=document.createElement('div');
+  el.className='streak-toast';el.textContent=msg;
+  document.body.appendChild(el);
+  setTimeout(function(){if(el.parentNode)el.remove();},1700);
+}
+
+/* ── CONFETTI ── */
+function spawnConfetti(){
+  var stage=document.getElementById('confettiStage');if(!stage)return;
+  stage.innerHTML='';
+  var cols=['#F5C842','#1F95E3','#4AE0A0','#FF9500','#E24B4A','#ffffff','#A78BFA'];
+  for(var i=0;i<36;i++){
+    var cf=document.createElement('div');cf.className='cf';
+    cf.style.left=(Math.random()*100)+'%';
+    cf.style.width=(7+Math.random()*9)+'px';
+    cf.style.height=(7+Math.random()*9)+'px';
+    cf.style.background=cols[i%cols.length];
+    cf.style.animationDuration=(1.4+Math.random()*1.6)+'s';
+    cf.style.animationDelay=(Math.random()*0.9)+'s';
+    stage.appendChild(cf);
+  }
+  setTimeout(function(){stage.innerHTML='';},4500);
+}
+
+/* ── RANK SYSTEM ── */
+function getRank(correct){
+  var ranks=[
+    {icon:'<i class="ti ti-school" style="color:#7C8A99" aria-hidden="true"></i>',title:'AP Trainee',sub:'Keep practicing — fraud patterns take time to master'},
+    {icon:'<i class="ti ti-clipboard-list" style="color:#1F95E3" aria-hidden="true"></i>',title:'AP Analyst',sub:'Good start — you caught some key fraud signals'},
+    {icon:'<i class="ti ti-search" style="color:#854F0B" aria-hidden="true"></i>',title:'AP Detective',sub:'Getting sharper — one more and you would have won'},
+    {icon:'<i class="ti ti-shield-check" style="color:#0F6E56" aria-hidden="true"></i>',title:'Fraud Fighter',sub:'Prize winner! Your instincts are protecting the organization'},
+    {icon:'<i class="ti ti-bolt" style="color:#F5C842" aria-hidden="true"></i>',title:'Fraud Expert',sub:'Exceptional — you caught almost every scheme'},
+    {icon:'<i class="ti ti-trophy" style="color:#F5C842" aria-hidden="true"></i>',title:'OAN Elite',sub:'Perfect score — you are an AP fraud detection master'}
+  ];
+  return ranks[Math.min(correct,5)];
+}
+
+document.getElementById('startBtn').addEventListener('click',startGame);
+document.getElementById('restartBtn').addEventListener('click',function(){document.getElementById('screen-result').style.display='none';startGame();});
+document.getElementById('changeLevelBtn').addEventListener('click',function(){document.getElementById('screen-result').style.display='none';showScreen('screen-start');});
+})();
+</script>
+</body>
+</html>
