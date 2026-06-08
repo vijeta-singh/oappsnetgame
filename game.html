@@ -84,7 +84,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:#EEF2FA;min-height:100v
 .go-btn:disabled{opacity:.35;cursor:default}
 
 /* GAME */
-.game-body{padding:1.5rem 2.25rem 2.25rem;background:#EEF2FA}
+.game-body{display:flex;align-items:flex-start;background:#EEF2FA;min-height:calc(100vh - 5rem)}
+#game-main{flex:1;min-width:0;padding:1.5rem 2.25rem 2.25rem}
 .hud{display:flex;align-items:center;gap:1.25rem;background:#F4F7FA;border-radius:2px;padding:1.125rem 2rem;margin-bottom:1rem}
 .hud-score-n{font-size:3rem;font-weight:900;color:#0F2A44;line-height:1}
 .hud-score-d{font-size:1.25rem;color:#7C8A99;margin-left:5px;font-weight:600}
@@ -266,23 +267,24 @@ body{font-family:'Inter',system-ui,sans-serif;background:#EEF2FA;min-height:100v
 
 /* ── OAN ASSIST SIDEBAR ── */
 #agentDrawer{
-  position:fixed;top:5rem;right:0;
-  width:420px;max-width:90vw;
-  max-height:calc(100vh - 5rem);
+  position:sticky;top:0;
+  width:0;
+  height:100vh;
+  flex-shrink:0;
   z-index:300;
-  transform:translateX(110%);
-  transition:transform .36s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+  transition:width .36s cubic-bezier(.4,0,.2,1);
   pointer-events:none;
-  display:flex!important;flex-direction:column;
 }
-#agentDrawer.open{transform:translateX(0);pointer-events:all}
+#agentDrawer.open{width:420px;pointer-events:all}
 #agentDrawer .agent-drawer{
+  width:420px;
+  height:100vh;
   display:flex;flex-direction:column;
-  max-height:calc(100vh - 5rem);
   margin-bottom:0;
-  border-radius:0 0 0 2px;
+  border-radius:0;
   box-shadow:-16px 0 48px rgba(6,17,30,.2);
-  border:2.5px solid #A9BACC;border-right:none;border-top:none;
+  border-left:2.5px solid #A9BACC;
   overflow:hidden;
 }
 #agentDrawer .agent-msgs{flex:1;min-height:0;overflow-y:auto;max-height:none}
@@ -591,40 +593,46 @@ body{font-family:'Inter',system-ui,sans-serif;background:#EEF2FA;min-height:100v
 <!-- GAME -->
 <div id="screen-game" style="display:none">
   <div class="game-body">
-    <div class="hud">
-      <div>
-        <div style="font-size:.875rem;color:#7C8A99;text-transform:uppercase;letter-spacing:.07em;font-weight:800;margin-bottom:4px">Score</div>
-        <span class="hud-score-n" id="scoreVal">0</span><span class="hud-score-d"> / 1,000</span>
-      </div>
-      <div class="hud-sep"></div>
-      <div><div class="hud-round-lbl">Round</div><div class="hud-pips" id="roundPips"></div></div>
-      <div class="hud-ml">
-        <div class="streak-wrap">
-          <span class="streak-lbl">Streak</span>
-          <div id="streakBadge" class="streak-badge"><i class="ti ti-bolt" style="font-size:.9rem;flex-shrink:0" aria-hidden="true"></i><span id="streakNum" class="streak-num"></span></div>
+    <div id="game-main">
+      <div class="hud">
+        <div>
+          <div style="font-size:.875rem;color:#7C8A99;text-transform:uppercase;letter-spacing:.07em;font-weight:800;margin-bottom:4px">Score</div>
+          <span class="hud-score-n" id="scoreVal">0</span><span class="hud-score-d"> / 1,000</span>
         </div>
         <div class="hud-sep"></div>
-        <div id="diffBadge" class="diff-badge diff-b">Beginner</div>
-        <div class="ll-pips" id="llPips"></div>
-        <span class="ll-txt" id="llTxt">3 hints</span>
-      </div>
-    </div>
-    <div class="timer-row">
-      <i class="ti ti-clock" style="font-size:1.375rem;color:#7C8A99" aria-hidden="true"></i>
-      <div class="t-bar"><div class="t-fill" id="timerFill" style="width:100%;background:#1D9E75"></div></div>
-      <div class="t-cd" id="timerCd">90s</div>
-      <div class="paused-tag" id="pausedTag"><i class="ti ti-player-pause" style="font-size:.875rem" aria-hidden="true"></i> Paused — OAN agent helping</div>
-    </div>
-    <div class="scen-card">
-      <div class="scen-card-top">
-        <div class="scen-left">
-          <div class="scen-cat" id="scenCat">Loading</div>
-          <div class="scen-q" id="scenQ"></div>
+        <div><div class="hud-round-lbl">Round</div><div class="hud-pips" id="roundPips"></div></div>
+        <div class="hud-ml">
+          <div class="streak-wrap">
+            <span class="streak-lbl">Streak</span>
+            <div id="streakBadge" class="streak-badge"><i class="ti ti-bolt" style="font-size:.9rem;flex-shrink:0" aria-hidden="true"></i><span id="streakNum" class="streak-num"></span></div>
+          </div>
+          <div class="hud-sep"></div>
+          <div id="diffBadge" class="diff-badge diff-b">Beginner</div>
+          <div class="ll-pips" id="llPips"></div>
+          <span class="ll-txt" id="llTxt">3 hints</span>
         </div>
-        <button class="star-btn" id="agentToggle" aria-label="Toggle OAN Assist">
-          <i class="ti ti-message-circle-2" id="agentBtnIcon" style="font-size:1.6rem;color:#fff" aria-hidden="true"></i>
-        </button>
       </div>
+      <div class="timer-row">
+        <i class="ti ti-clock" style="font-size:1.375rem;color:#7C8A99" aria-hidden="true"></i>
+        <div class="t-bar"><div class="t-fill" id="timerFill" style="width:100%;background:#1D9E75"></div></div>
+        <div class="t-cd" id="timerCd">90s</div>
+        <div class="paused-tag" id="pausedTag"><i class="ti ti-player-pause" style="font-size:.875rem" aria-hidden="true"></i> Paused — OAN agent helping</div>
+      </div>
+      <div class="scen-card">
+        <div class="scen-card-top">
+          <div class="scen-left">
+            <div class="scen-cat" id="scenCat">Loading</div>
+            <div class="scen-q" id="scenQ"></div>
+          </div>
+          <button class="star-btn" id="agentToggle" aria-label="Toggle OAN Assist">
+            <i class="ti ti-message-circle-2" id="agentBtnIcon" style="font-size:1.6rem;color:#fff" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+      <div id="vendorWrap"></div>
+      <div class="choices" id="choices"></div>
+      <div class="fb" id="feedback" style="display:none"></div>
+      <button class="nxt-btn" id="nextBtn" style="display:none">Next question <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
     </div>
     <div class="agent-backdrop" id="agentBackdrop"></div>
     <div id="agentDrawer">
@@ -644,10 +652,6 @@ body{font-family:'Inter',system-ui,sans-serif;background:#EEF2FA;min-height:100v
         <div class="no-ll" id="noLl" style="display:none">No hints remaining</div>
       </div>
     </div>
-    <div id="vendorWrap"></div>
-    <div class="choices" id="choices"></div>
-    <div class="fb" id="feedback" style="display:none"></div>
-    <button class="nxt-btn" id="nextBtn" style="display:none">Next question <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
   </div>
 </div>
 
